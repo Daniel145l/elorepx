@@ -1,0 +1,221 @@
+/* ESTILIZAÇÕES DE RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background-color: #10101E;
+}
+
+/* ESTILIZAÇÕES PADRÃO */
+
+div.center {
+    margin: 0 auto;
+    padding: 0 2%;
+    max-width: 1200px;
+}
+
+div.clear {
+    clear: both;
+}
+
+/* ESTILIZAÇÕES NORMAIS */
+
+/* Header */
+
+section.banner {
+    padding: 20px 0;
+    height: 600px;
+    background-image: url('../images/banner.PNG');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+div.logo {
+    width: 159px;
+    height: 60px;
+    float: left;
+    background-image: url('../images/logo.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+div.icone-menu {
+    width: 32px;
+    height: 32px;
+    float: right;
+    cursor: pointer;
+    background-image: url('../images/menu.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+nav.menu {
+    float: right;
+    padding: 42px 10px;
+    background-color: grey;
+    box-shadow: 0 0 30px #000;
+    display: none;
+}
+
+nav.menu ul {
+    list-style-type: none;
+}
+
+nav.menu a {
+    display: inline-block;
+    color: #FFF;
+    text-decoration: none;
+    font-size: 22px;
+    padding: 0 15px 20px 15px;
+}
+
+div.slogan-btn {
+    width: 640px;
+    margin-top: 110px;
+}
+
+div.slogan-btn h2 {
+    color: #FFF;
+    font-size: 44px;
+    margin-bottom: 35px;
+}
+
+div.slogan-btn a {
+    padding: 14px 30px;
+    margin-top: 20px;
+    display: inline-block;
+    border-radius: 30px;
+    background-color: #F90449;
+    border: 3px solid transparent;
+    color: #FFF;
+    font-weight: bold;
+    text-decoration: none;
+    transition: .3s all;
+}
+
+div.slogan-btn a:hover {
+    background-color: transparent;
+    border: 3px solid #F90449;
+}
+
+/* Fim do Header */
+
+/* Section.opcoes */
+
+section.opcoes {
+    background-color: #10101E;
+    padding: 25px 0;
+}
+
+h3.frase-opcoes {
+    color: #8A8AEE;
+    font-weight: normal;
+    font-size: 24px;
+    word-spacing: 7px;
+    margin-bottom: 40px;
+}
+
+div.box-opcoes {
+    width: 100%;
+    text-align: center;
+}
+
+a.link-opcao-unica {
+    text-decoration: none;
+}
+
+div.opcao-unica {
+    width: 30%;
+    padding: 30px 20px;
+    margin: 0 10px;
+    transform: scale(1.0);
+    text-align: center;
+    display: inline-block;
+    border: 3px solid #8D8DFF;
+    transition: .3s all;
+}
+
+div.opcao-unica:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 50px #000;
+}
+
+div.opcao-unica img {
+    height: 30px;
+}
+
+p.p-maior {
+    color: #A9A9DD;
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+p.p-menor {
+    color: #8D8DFF;
+}
+
+/* Fim da estilização da section.opcoes */
+
+/* Section.missao */
+
+section.missao {
+    background-color: #232339;
+    padding: 50px 0;
+}
+
+div.flex-missao {
+    display: flex;
+}
+
+div.box-textos-missao {
+    width: 50%;
+}
+
+section.missao h2 {
+    color: #7979BF;
+    font-size: 40px;
+    margin-bottom: 40px;
+}
+
+section.missao p {
+    color: #D9D9FF;
+    font-size: 18px;
+    text-align: justify;
+}
+
+div.img-missao {
+    width: 50%;
+    background-image: url('../images/foguete.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* Fim da section.missao */
+
+/* Footer */
+
+footer {
+    background-color: #10101E;
+    text-align: center;
+    padding: 30px 0;
+    color: #8D8DFF;
+    border-top: 1px solid #000;
+}
+
+footer div.logo {
+    float: none;
+    display: inline-block;
+}
