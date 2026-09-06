@@ -24,6 +24,15 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.session?.user ?? null
   }
 
+  let sessionReadyPromise: Promise<void> | null = null
+
+  function ensureSessionRestored() {
+    if (!sessionReadyPromise) {
+      sessionReadyPromise = restoreSession()
+    }
+    return sessionReadyPromise
+  }
+
   async function signUp(email: string, password: string, nickname: string) {
     loading.value = true
     errorMessage.value = null
@@ -84,6 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     initSessionListener,
     restoreSession,
+    ensureSessionRestored,
     signUp,
     signIn,
     signOut,
