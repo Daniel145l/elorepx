@@ -1,3 +1,4 @@
+import '@fontsource/madimi-one/400.css'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'

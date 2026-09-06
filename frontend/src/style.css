@@ -7,3 +7,7 @@
   --color-elorepx-purple-600: #6d3fb8;
   --color-elorepx-purple-500: #8b5cf6;
 }
+
+@theme {
+  --font-display: "Madimi One", sans-serif;
+}
