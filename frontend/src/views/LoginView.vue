@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AuthLayout from '@/components/AuthLayout.vue';
 import BaseInput from '@/components/BaseInput.vue';
-import ButtonPrimary from '@/components/ButtonPrimary.vue';
+import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
 import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
