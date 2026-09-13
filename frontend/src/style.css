@@ -3,11 +3,12 @@
 @theme {
   --color-elorepx-purple-950: #120b1f;
   --color-elorepx-purple-900: #1e1233;
-  --color-elorepx-purple-700: #4b2a8a;
-  --color-elorepx-purple-600: #6d3fb8;
-  --color-elorepx-purple-500: #8b5cf6;
+  --color-elorepx-purple-700: #432366;
+  --color-elorepx-purple-600: #5E3685;
+  --color-elorepx-purple-500: #7B4DA8;
 }
 
 @theme {
   --font-display: "Madimi One", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
