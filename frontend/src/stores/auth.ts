@@ -44,6 +44,8 @@ export const useAuthStore = defineStore('auth', () => {
         options: { data: {nickname} }
       })
       if(error) throw error
+      session.value = data.session
+      user.value = data.user
       return data
     }catch(err) {
       errorMessage.value = (err as Error).message
@@ -63,6 +65,8 @@ export const useAuthStore = defineStore('auth', () => {
         password
       })
       if(error) throw error
+      session
+      user.value = data.user
       return data
     }catch(err) {
       errorMessage.value = (err as Error).message
@@ -77,6 +81,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const { error } = await supabase.auth.signOut()
+      console.log("saindo")
       if(error) console.warn(error.message)
     } finally {
       user.value = null
