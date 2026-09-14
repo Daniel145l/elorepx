@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
+import CuriosityCard from '@/components/cards/CuriosityCard.vue';
 import MissionCard from '@/components/cards/MissionCard.vue';
 import PowerCard from '@/components/cards/PowerCard.vue';
 import Header from '@/components/header/Header.vue';
@@ -33,7 +34,7 @@ async function handleSubmit() {
       <img src="/background-home.svg" alt="" class="relative w-full">
       <div class="absolute top-[50%] flex flex-col items-center translate-y-[-50%] gap-5 px-4 text-center w-full">
         <h1 class="text-white text-center font-display text-xl">Vire um cientista e venha explorar o mundo que está a sua volta</h1>
-        <RouterLink to="/cadastrar" class="w-[40%]">
+        <RouterLink to="/cadastro" class="w-[40%]">
           <ButtonPrimary :texto="'Explorar'" class="w-full text-sm"/>
         </RouterLink>
       </div>
@@ -73,9 +74,9 @@ async function handleSubmit() {
 
   <ReportsSection />
 
-  <section class="px-5">
+  <section class="px-5 mb-8">
     <TitlePrimary texto="A ciência no dia a dia"/>
-    
+    <CuriosityCard />
   </section>
 
   <ScientistsSection />
