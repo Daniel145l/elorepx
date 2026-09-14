@@ -1,7 +1,9 @@
 import cors from 'cors'
 import 'dotenv/config'
 import express from 'express'
-import { supabaseAdmin } from './lib/supabaseAdmin.js'
+// import { conteudoDinamicoRouter } from './routes/conteudoDinamico.js'
+import { curiosidadeDoDiaRouter } from './routes/curiosidadeDoDia.js'
+import { iaRouter } from './routes/ia.js'
 
 const app = express()
 const PORT = process.env.PORT ?? 3333
@@ -14,11 +16,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.listen(PORT, () => {
-  console.log(`backend rodando em http://localhost${PORT}`)
-})
+app.use('/api/ia', iaRouter)
+app.use('/api/curiosidade-do-dia', curiosidadeDoDiaRouter)
+// app.use('/api/conteudo', conteudoDinamicoRouter)
 
-app.get('/test-db', async(req, res) => {
-  const { data, error } = await supabaseAdmin.from('cientistas').select('id, nome').limit(3)
-  res.json({data, error})
+ app.listen(PORT, () => {
+  console.log(`backend rodando em http://localhost${PORT}`)
 })
