@@ -14,12 +14,15 @@ const aberto = ref(false)
     <p v-else-if="error">Erro ao carregar curiosidade</p>
     <div v-else-if="curiosidade" class="font-inter overflow-hidden">
       <button
-        class="w-full flex justify-between items-center"
+        class="w-full flex flex-col justify-between gap-2"
         @click="aberto = !aberto"
       >
-        <h3 class="font-bold capitalize">{{ curiosidade.tema }}?</h3>
+      <span class="text-xs leading-none text-left">Curiosidade do dia:</span>
+        <div class="flex justify-between items-center w-full">
+          <h3 class="font-bold capitalize text-left">{{ curiosidade.tema }}?</h3>
+          <ChevronDown :size="20" class="shrink-0 transition-transform" :class="{ 'rotate-180' : aberto }"/>
+        </div>
         <!-- <Sparkles v-if="!aberto" :size="20"></Sparkles> -->
-        <ChevronDown :size="20" class="shrink-0 transition-transform" :class="{ 'rotate-180' : aberto }"/>
       </button>
       <p v-if="aberto" class="text-sm text-justify mt-3 whitespace-pre-line transition-all">{{ curiosidade.texto }}</p>
     </div>

@@ -10,6 +10,7 @@ import TitlePrimary from '@/components/titles/TitlePrimary.vue';
 import { Brain, Eye, HatGlasses } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 
+import NasaApodCard from '@/components/cards/NasaApodCard.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore()
@@ -77,6 +78,7 @@ async function handleSubmit() {
   <section class="px-5 mb-8">
     <TitlePrimary texto="A ciência no dia a dia"/>
     <CuriosityCard />
+    <NasaApodCard />
   </section>
 
   <ScientistsSection />

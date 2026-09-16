@@ -1,7 +1,7 @@
 import cors from 'cors'
 import 'dotenv/config'
 import express from 'express'
-// import { conteudoDinamicoRouter } from './routes/conteudoDinamico.js'
+import { conteudoDinamicoRouter } from './routes/conteudoDinamico.js'
 import { curiosidadeDoDiaRouter } from './routes/curiosidadeDoDia.js'
 import { iaRouter } from './routes/ia.js'
 
@@ -18,7 +18,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/ia', iaRouter)
 app.use('/api/curiosidade-do-dia', curiosidadeDoDiaRouter)
-// app.use('/api/conteudo', conteudoDinamicoRouter)
+app.use('/api/conteudo', conteudoDinamicoRouter)
 
  app.listen(PORT, () => {
   console.log(`backend rodando em http://localhost${PORT}`)
