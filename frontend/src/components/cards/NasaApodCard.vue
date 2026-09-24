@@ -9,7 +9,7 @@ const aberto = ref(false)
 </script>
 
 <template>
-  <article class="shadow-[0px_0px_6px_0px_rgba(0,0,0,0.25)] p-4 rounded-xl mt-4">
+  <article class="shadow-[0px_0px_6px_0px_rgba(0,0,0,0.25)] p-4 rounded-xl mt-4 bg-white">
     <p v-if="loading">Carregando curiosidade</p>
     <p v-else-if="error">Erro ao carregar curiosidade</p>
     <div v-else-if="apod" class="font-inter overflow-hidden">

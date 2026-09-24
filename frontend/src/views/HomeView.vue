@@ -75,13 +75,16 @@ async function handleSubmit() {
 
   <ReportsSection />
 
-  <section class="px-5 mb-8">
-    <TitlePrimary texto="A ciência no dia a dia"/>
+  <section class="px-5 mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
+    <TitlePrimary texto="A ciência no dia a dia" class="text-white"/>
     <CuriosityCard />
     <NasaApodCard />
   </section>
 
   <ScientistsSection />
 
-  <button @click="handleSubmit">Sair</button>
+  <button @click="handleSubmit">Sair</button> </br>
+  <RouterLink to="/simulados">
+    simulados
+  </RouterLink>
 </template>
