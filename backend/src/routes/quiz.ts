@@ -36,6 +36,64 @@ quizRouter.get('/questoes', async(req, res) => {
   res.json(data)
 })
 
+async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
+    assunto: string
+    correta: boolean
+  }[]) {
+    const acertosPorAssunto: Record<string, number> = {}
+    for (const r of resultadosValidos) {
+      if (r.correta) {
+        acertosPorAssunto[r.assunto] = (acertosPorAssunto[r.assunto] ?? 0) + 1
+      }
+    }
+
+    const assuntosComAcerto = Object.keys(acertosPorAssunto)
+    if (assuntosComAcerto.length === 0) return
+
+    const { data: missoesRelevantes, error: erroMissoes } = await supabaseAdmin
+      .from('missoes')
+      .select('id, meta')
+      .in('meta->>assunto', assuntosComAcerto)
+
+    if (erroMissoes || !missoesRelevantes) {
+      console.error('[quiz/corrigir] falha ao buscar missões relevantes:', erroMissoes)
+      return
+    }
+
+    for (const missao of missoesRelevantes) {
+      const assunto = missao.meta.assunto as string
+      const meta = missao.meta.quantidade as number
+      const incremento = acertosPorAssunto[assunto]
+
+      const { data: progressoAtual } = await supabaseAdmin
+        .from('usuario_missoes')
+        .select('progresso, concluida')
+        .eq('user_id', userId)
+        .eq('missao_id', missao.id)
+        .maybeSingle()
+
+      const progressoAnterior = progressoAtual?.progresso ?? 0
+      const novoProgresso = Math.min(meta, progressoAnterior + incremento)
+      const novaConclusao = novoProgresso >= meta
+
+      const { error: erroUpsert } = await supabaseAdmin
+        .from('usuario_missoes')
+        .upsert(
+          {
+            user_id: userId,
+            missao_id: missao.id,
+            progresso: novoProgresso,
+            concluida: novaConclusao,
+          },
+          { onConflict: 'user_id,missao_id' }
+        )
+
+      if (erroUpsert) {
+        console.error('[quiz/corrigir] falha ao atualizar progresso de missão:', erroUpsert)
+      }
+    }
+  }
+
 interface RespostaEnviada {
   questao_id: string
   resposta_dada: string
@@ -112,6 +170,8 @@ quizRouter.post('/corrigir', async (req, res) => {
     if (erroInsert) {
       console.error('[quiz/corrigir] falha ao salvar tentativas:', erroInsert)
     }
+
+    await atualizarProgressoMissoes(authReq.userId!, resultadosValidos)
 
     const porAssunto: Record<string, { acertos: number; total: number }> = {}
     for (const r of resultadosValidos) {

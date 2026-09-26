@@ -23,6 +23,7 @@ onMounted(async () => {
   .from('missoes')
   .select('id, titulo, descricao, meta, usuario_missoes(progresso, concluida)')
   .limit(1)
+  .eq('titulo', 'Missão de Astronomia')
   .single()
 
   missao.value = data
