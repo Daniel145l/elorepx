@@ -16,15 +16,15 @@ interface Questao {
 }
 
 quizRouter.get('/questoes', async(req, res) => {
-  const { assunto, nivel, quantidade } = req.query
+  const { olimpiada_id, nivel_id, quantidade } = req.query
 
   let query = supabaseAdmin
     .from('questoes')
-    .select('id, assunto, nivel_dificuldade, enunciado, alternativas')
+    .select('id, assunto, nivel_id, enunciado, alternativas')
     .limit(Number(quantidade))
 
-  if(assunto) query = query.eq('assunto', assunto as string)
-  if(nivel) query = query.eq('nivel_dificuldade', nivel as string)
+  if(olimpiada_id) query = query.eq('olimpiada_id', olimpiada_id as string)
+  if(nivel_id) query = query.eq('nivel_id', nivel_id as string)
 
   const { data, error } = await query
 
