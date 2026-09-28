@@ -55,3 +55,59 @@ insert into public.relatos_alunos (titulo, texto, fonte_url, fonte_nome) values
 
 insert into public.missoes (titulo, descricao, meta) values
 ('Missão de Astronomia', 'Resolver 5 questões de Astronomia', '{"quantidade": 5}'::jsonb);
+
+insert into public.questoes (assunto, nivel_dificuldade, enunciado, alternativas, resposta_correta) values
+
+-- Astronomia
+('Astronomia', 'facil',
+ 'Qual é o planeta mais próximo do Sol?',
+ '[{"id":"a","texto":"Vênus"},{"id":"b","texto":"Mercúrio"},{"id":"c","texto":"Terra"},{"id":"d","texto":"Marte"}]'::jsonb,
+ 'b'),
+
+('Astronomia', 'facil',
+ 'O que causa as fases da Lua?',
+ '[{"id":"a","texto":"A sombra da Terra sobre a Lua"},{"id":"b","texto":"A rotação da Lua sobre seu próprio eixo"},{"id":"c","texto":"A posição relativa entre Terra, Lua e Sol"},{"id":"d","texto":"A distância variável entre a Lua e o Sol"}]'::jsonb,
+ 'c'),
+
+('Astronomia', 'medio',
+ 'Qual é a estrela mais próxima da Terra, além do Sol?',
+ '[{"id":"a","texto":"Sirius"},{"id":"b","texto":"Alpha Centauri"},{"id":"c","texto":"Proxima Centauri"},{"id":"d","texto":"Betelgeuse"}]'::jsonb,
+ 'c'),
+
+('Astronomia', 'medio',
+ 'O que é uma supernova?',
+ '[{"id":"a","texto":"O nascimento de uma nova estrela"},{"id":"b","texto":"A explosão final de uma estrela massiva"},{"id":"c","texto":"A colisão entre dois planetas"},{"id":"d","texto":"Um tipo de buraco negro pequeno"}]'::jsonb,
+ 'b'),
+
+-- Física
+('Física', 'facil',
+ 'Qual grandeza física mede a quantidade de matéria em um corpo?',
+ '[{"id":"a","texto":"Peso"},{"id":"b","texto":"Massa"},{"id":"c","texto":"Densidade"},{"id":"d","texto":"Volume"}]'::jsonb,
+ 'b'),
+
+('Física', 'facil',
+ 'O que a Primeira Lei de Newton descreve?',
+ '[{"id":"a","texto":"A relação entre força, massa e aceleração"},{"id":"b","texto":"A ação e reação entre dois corpos"},{"id":"c","texto":"A inércia de um corpo em repouso ou movimento uniforme"},{"id":"d","texto":"A gravitação universal"}]'::jsonb,
+ 'c'),
+
+('Física', 'medio',
+ 'Qual é a unidade de medida da força no Sistema Internacional?',
+ '[{"id":"a","texto":"Joule"},{"id":"b","texto":"Watt"},{"id":"c","texto":"Newton"},{"id":"d","texto":"Pascal"}]'::jsonb,
+ 'c'),
+
+-- Química
+('Química', 'facil',
+ 'Qual é o símbolo químico do oxigênio?',
+ '[{"id":"a","texto":"Ox"},{"id":"b","texto":"O"},{"id":"c","texto":"Og"},{"id":"d","texto":"O2"}]'::jsonb,
+ 'b'),
+
+('Química', 'facil',
+ 'O que caracteriza uma reação exotérmica?',
+ '[{"id":"a","texto":"Absorção de calor do ambiente"},{"id":"b","texto":"Liberação de calor para o ambiente"},{"id":"c","texto":"Formação de um novo elemento químico"},{"id":"d","texto":"Ausência de troca de energia"}]'::jsonb,
+ 'b'),
+
+-- Biologia
+('Biologia', 'facil',
+ 'Qual organela é responsável pela respiração celular?',
+ '[{"id":"a","texto":"Núcleo"},{"id":"b","texto":"Mitocôndria"},{"id":"c","texto":"Ribossomo"},{"id":"d","texto":"Retículo endoplasmático"}]'::jsonb,
+ 'b');
