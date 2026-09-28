@@ -8,7 +8,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 
-type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
+type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo' | 'resultado'
 
  interface Alternativa {
   id: string;
@@ -19,7 +19,7 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
   id: string;
   assunto: string;
   enunciado: string;
-  alternativas: string
+  alternativas: Alternativa[]
  }
 
  interface ResultadoQuestao {
@@ -54,6 +54,8 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
 
  const olimpiadaEscolhida = ref<Olimpiada | null>(null)
  const niveis = ref<Nivel[]>([])
+ const quantidade = ref(5)
+ const OPCOES_QUANTIDADE = [5, 10, 15]
 
  const { authFetch } = useAuthFetch()
  const router = useRouter()
@@ -100,6 +102,7 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
     return
   }
 
+  // etapa.value = 'selecao-qtd-questoes'
   etapa.value = 'selecao-nivel'
  }
 
@@ -110,7 +113,9 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
   erro.value = null
 
   try {
-    const response = await authFetch(`/api/quiz/questoes?olimpiada_id=${olimpiadaEscolhida.value.id}&nivel_id=${nivelId}&quantidade=5`)
+    const response = await authFetch(`/api/quiz/questoes?olimpiada_id=${olimpiadaEscolhida.value.id}&nivel_id=${nivelId}&quantidade=10`)
+    // const response = await authFetch(`/api/quiz/questoes?olimpiada_id=${olimpiadaEscolhida.value.id}&nivel_id=${nivelId}&quantidade=${qtdQuestoes}`)
+
     if (!response.ok) throw new Error('Não foi possível carregar as questões.')
 
     questoes.value = await response.json()
@@ -198,9 +203,37 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'respondendo' | 'resultado'
       </div>
     </section>
 
-    <section v-else-if="etapa === 'selecao-nivel'">
-      <h1>Escolha o nível — {{ olimpiadaEscolhida?.nome }}</h1>
+    <!-- <section v-else-if="etapa === 'selecao-qtd-questoes'">
+      <h1>Escolha a quantidade de questões</h1>
+      <button
+          v-for="nivel in niveis"
+          :key="nivel.id"
+          :disabled="carregando"
+          class="border rounded-lg px-4 py-3 text-left"
+          @click="iniciarSimulado(nivel.id, qtdQuestoes)"
+        >
+          <span class="font-semibold">{{ nivel.nome }}</span>
+          <span v-if="nivel.descricao" class="block text-sm text-gray-500">{{ nivel.descricao }}</span>
+        </button>
+    </section> -->
 
+    <section v-else-if="etapa === 'selecao-nivel'">
+      
+      <h1>Escolha a quantidade de questões</h1>
+
+      <div class="flex flex-col gap-3 mt-4">
+        <button
+          v-for="qtd in OPCOES_QUANTIDADE"
+          :key="qtd"
+          :disabled="carregando"
+          class="border rounded-lg px-4 py-3 text-left"
+          @click="quantidade = qtd"
+        >
+          {{ qtd }}
+       </button>
+      </div>
+    
+      <h1>Escolha o nível — {{ olimpiadaEscolhida?.nome }}</h1>
       <div class="flex flex-col gap-3 mt-4">
         <button
           v-for="nivel in niveis"

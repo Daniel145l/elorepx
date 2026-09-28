@@ -17,11 +17,12 @@ interface Questao {
 
 quizRouter.get('/questoes', async(req, res) => {
   const { olimpiada_id, nivel_id, quantidade } = req.query
+  const quantidadeNum = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
 
   let query = supabaseAdmin
-    .from('questoes')
-    .select('id, assunto, nivel_id, enunciado, alternativas')
-    .limit(Number(quantidade))
+  .from('questoes')
+  .select('id, assunto, enunciado, alternativas')
+  .limit(quantidadeNum)
 
   if(olimpiada_id) query = query.eq('olimpiada_id', olimpiada_id as string)
   if(nivel_id) query = query.eq('nivel_id', nivel_id as string)
