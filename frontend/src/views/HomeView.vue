@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
 import CuriosityCard from '@/components/cards/CuriosityCard.vue';
 import MissionCard from '@/components/cards/MissionCard.vue';
 import PowerCard from '@/components/cards/PowerCard.vue';
@@ -11,6 +10,7 @@ import { Brain, Eye, HatGlasses } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 
 import NasaApodCard from '@/components/cards/NasaApodCard.vue';
+import ApresentationSection from '@/components/sections/ApresentationSection.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore()
@@ -30,7 +30,14 @@ async function handleSubmit() {
 <template>
   <Header />
 
-  <section class="mt-6 px-5 relative">
+  <!-- 
+  Olá, investigador de código-fonte!
+  Queria deixar um agradecimento especial à alguém também muito especial:
+  Agradeço a sophia por me ajudar em todos os momentos a fazer essa plataforma! Esperamos que vocês gostem 
+  -->
+
+  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'"/>
+  <!-- <section class="mt-6 px-5 relative">
     <div class="relative">
       <img src="/background-home.svg" alt="" class="relative w-full">
       <div class="absolute top-[50%] flex flex-col items-center translate-y-[-50%] gap-5 px-4 text-center w-full">
@@ -40,7 +47,7 @@ async function handleSubmit() {
         </RouterLink>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <section class="px-5 my-12">
     <!-- <div class="bg-[url(/fita.svg)] bg-center bg-contain bg-no-repeat w-full h-21.25">
