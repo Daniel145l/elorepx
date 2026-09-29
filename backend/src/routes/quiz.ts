@@ -37,7 +37,7 @@ quizRouter.get('/questoes', async(req, res) => {
   res.json(data)
 })
 
-async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
+  async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
     assunto: string
     correta: boolean
   }[]) {
@@ -94,6 +94,126 @@ async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
       }
     }
   }
+
+const XP_POR_ACERTO = 10
+
+const NIVEIS_NARRATIVOS = [
+  { nome: 'Aspirante', xpMinimo: 0 },
+  { nome: 'Explorador', xpMinimo: 50 },
+  { nome: 'Olimpista', xpMinimo: 150 },
+  { nome: 'Cientista', xpMinimo: 350 },
+]
+
+function calcularNivelNarrativo(xp: number): string {
+  let nivel = NIVEIS_NARRATIVOS[0].nome
+
+  for(const n of NIVEIS_NARRATIVOS) {
+    if(xp >= n.xpMinimo) nivel = n.nome
+  }
+
+  return nivel
+}
+
+interface ConquistaNova {
+  codigo: string,
+  nome: string
+}
+
+interface ProgressoGamificacao {
+  xpGanho: number,
+  nivelAtual: string,
+  subiuDeNivel: boolean,
+  conquistasNovas: ConquistaNova[]
+}
+
+async function atualizarXpNivelEConquista(
+  userId: string,
+  resultadosValidos: { correta: boolean }[]
+):Promise<ProgressoGamificacao> {
+  const acertos = resultadosValidos.filter((r) => r.correta).length
+  const xpGanho = acertos * XP_POR_ACERTO
+
+  const { data: perfil, error: erroPerfil } = await supabaseAdmin
+    .from('profiles')
+    .select('xp, nivel_narrativo, ultima_atividade, sequencia_dias')
+    .eq('id', userId)
+    .single()
+
+  if (erroPerfil || !perfil) {
+    console.error('[quiz/corrigir] falha ao buscar perfil:', erroPerfil)
+    return { xpGanho: 0, nivelAtual: 'Aspirante', subiuDeNivel: false, conquistasNovas: [] }
+  }
+
+  const xpNovo = perfil.xp + xpGanho
+  const nivelAnterior = perfil.nivel_narrativo
+  const novoNivel = calcularNivelNarrativo(xpNovo)
+
+  const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
+  const ontem = new Date(Date.now() - 86400000).toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
+
+  let novaSequencia = 0
+  if(perfil.ultima_atividade === hoje) {
+    novaSequencia = perfil.sequencia_dias
+  }else if(perfil.ultima_atividade === ontem) {
+    novaSequencia = perfil.sequencia_dias + 1
+  } else {
+    novaSequencia = 1
+  }
+
+  await supabaseAdmin
+    .from('profiles')
+    .update({ xp: xpNovo, nivel_narrativo: novoNivel, ultima_atividade: hoje, sequencia_dias: novaSequencia })
+    .eq('id', userId)
+
+  const { count: totalApos } = await supabaseAdmin
+    .from('tentativas_resposta')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+
+  const totalAntes = (totalApos ?? 0) - resultadosValidos.length
+
+  const codigosParaConceder: string[] = []
+
+  if(totalAntes === 0) {
+    codigosParaConceder.push('primeira_questao', 'primeiro_quiz')
+  }
+  if(totalAntes < 100 && (totalApos ?? 0) >= 100 ) {
+    codigosParaConceder.push('100_questoes')
+  }
+  if(novaSequencia === 3) codigosParaConceder.push('sequencia_3_dias')
+  if(novaSequencia === 7) codigosParaConceder.push('sequencia_7_dias')
+  if(novaSequencia === 30) codigosParaConceder.push('sequencia_30_dias')
+
+  const conquistasNovas: ConquistaNova[] = []
+
+  if(codigosParaConceder.length > 0) {
+    const { data: medalhas } = await supabaseAdmin
+      .from('medalha')
+      .select('id, codigo, nome')
+      .in('codigo', codigosParaConceder)
+
+    for(const medalha of medalhas ?? []) {
+      const { error: erroMedalha } = await supabaseAdmin
+        .from('usuario_medalha')
+        .insert({ user_id: userId, medalha_id: medalha.id })
+
+      if(!erroMedalha) {
+        conquistasNovas.push({ codigo: medalha.codigo, nome: medalha.nome })
+      }
+    }
+  }
+
+  // xpGanho: number,
+  // nivelAtual: string,
+  // subiuDeNivel: boolean,
+  // conquistasNovas: ConquistaNova[]
+  return { 
+    xpGanho, 
+    nivelAtual: novoNivel,
+    subiuDeNivel: novoNivel !== nivelAnterior,
+    conquistasNovas
+  }
+}
 
 interface RespostaEnviada {
   questao_id: string
@@ -174,6 +294,19 @@ quizRouter.post('/corrigir', async (req, res) => {
 
     await atualizarProgressoMissoes(authReq.userId!, resultadosValidos)
 
+    let gamificacao: ProgressoGamificacao = {
+      xpGanho: 0,
+      nivelAtual: 'Aspirante',
+      subiuDeNivel: false,
+      conquistasNovas: []
+    }
+    
+    try {
+      gamificacao = await atualizarXpNivelEConquista(authReq.userId!, resultadosValidos)
+    }catch (err) {
+      console.log('[quiz/corrigir] falha ao atualizar XP/conquistas:', err)
+    }
+
     const porAssunto: Record<string, { acertos: number; total: number }> = {}
     for (const r of resultadosValidos) {
       porAssunto[r.assunto] ??= { acertos: 0, total: 0 }
@@ -186,6 +319,7 @@ quizRouter.post('/corrigir', async (req, res) => {
       resumoPorAssunto: porAssunto,
       totalAcertos: resultadosValidos.filter((r) => r.correta).length,
       totalQuestoes: resultadosValidos.length,
+      gamificacao
     })
   } catch (err) {
     console.error('[quiz/corrigir] erro inesperado:', err)
