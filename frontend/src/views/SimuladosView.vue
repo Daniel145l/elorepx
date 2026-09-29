@@ -5,6 +5,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
 import { useAuthFetch } from '@/composables/useAuthFetch';
 import { useSupabaseList } from '@/composables/useSupabaseList';
 import { supabase } from '@/lib/supabase';
+import { BookMarkedIcon, Brain, ChartNoAxesCombined, Clock, FlaskConicalIcon, Hourglass, Lightbulb, MicroscopeIcon, NotebookPen, Rocket, ZapIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 
@@ -224,19 +225,22 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
   }
 
   async function buscarCuriosidade(questaoId: string, assunto: string) {
+    const questao = encontrarQuestao(questaoId)
+    if(!questao) return
+
     carregandoCuriosidade.value[questaoId] = true
 
     try {
-      const response = await authFetch('/api/ia/curiosidades', {
+      const response = await authFetch('/api/ia/curiosidade', {
         method: 'POST',
-        body: JSON.stringify({ assunto }),
+        body: JSON.stringify({ tema: `${assunto}: ${questao.enunciado}` }),
       })
 
       if(!response.ok) throw new Error('Falha ao obter curiosidade.')
 
       const data = await response.json()
+      curiosidades.value[questaoId] = data.curiosidade ?? 'Curiosidade indisponível no momento.'
 
-      curiosidades.value[questaoId] = data.curiosidade || data.texto || 'Curiosidade indisponível no momento.'
     }catch(err) {
       curiosidades.value[questaoId] = 'Não foi possível carregar a curiosidade.'
     }finally {
@@ -249,195 +253,335 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
 <template>
   <Header/>
 
-  <ApresentationSection v-if="etapa != 'respondendo'" :text="'Desvende o universo das questões'"/>
+  <ApresentationSection v-if="etapa != 'respondendo' && etapa != 'resultado'" :text="'Desvende o universo das questões'"/>
   <section class="max-w-xl mx-auto px-4 py-8">
 
     <p v-if="erro" class="text-red-600 text-sm mt-2">{{ erro }}</p>
 
+    <!-- seção para escolher a olimpíada -->
     <section v-if="etapa === 'selecao'" class="flex flex-col">
-      <h2 class="text-lg text-white text-center bg-elorepx-purple-700 rounded-t-3xl p-3">Escolha uma olimpíada para o simulado</h2>
+      <div class="bg-elorepx-purple-700 text-white text-center rounded-t-2xl p-4 shadow-md">
+        <h2 class="text-base">Escolha uma olimpíada</h2>
+        <p class="text-xs text-purple-200 mt-0.5">Selecione a olimpíada que quer praticar</p>
+      </div>
   
-      <div class="flex flex-col gap-3 border rounded-b-3xl p-4">
-        <button
-          v-for="olimpiada in olimpiadas"
-          :key="olimpiada.id"
-          :disabled="carregando"
-          class="border rounded-lg px-4 py-3 text-left disabled:opacity-50"
-          @click="escolherOlimpiada(olimpiada)"
-        >
-          {{ olimpiada.nome }}
-        </button>
+      <div class="flex flex-col p-4 gap-3 border border-t-0 rounded-b-2xl shadow-sm">
+
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            v-for="olimpiada in olimpiadas"
+            :key="olimpiada.id"
+            :disabled="carregando"
+            class="flex flex-col items-center justify-center p-4 bg-white border-2 rounded-2xl transition-all duration-200 hover:border-purple-300 hover:shadow-md disabled:opacity-50 text-center relative"
+            :class="olimpiadaEscolhida?.id === olimpiada.id 
+              ? 'border-elorepx-purple-600 bg-purple-50/60 shadow-sm scale-[1.02]' 
+              : 'border-gray-300 hover:bg-gray-50'"
+            @click="escolherOlimpiada(olimpiada)"
+          >
+
+            <span class="text-3xl mb-2">
+              <span v-if="olimpiada.nome.includes('OBA')"><Rocket /></span>
+              <span v-else-if="olimpiada.nome.includes('OBFEP')"><ZapIcon /></span>
+              <span v-else-if="olimpiada.nome.includes('ONC')"><MicroscopeIcon /></span>
+              <span v-else><FlaskConicalIcon /></span>
+            </span>
+            <span class="text-gray-800 text-base">
+              {{ olimpiada.nome }}
+            </span>
+          </button>
+        </div>
       </div>
     </section>
 
-    <section v-else-if="etapa === 'selecao-nivel'" class="flex flex-col">
+    <!-- seção para esolher a quantidade de questões e o nível -->
+    <section v-else-if="etapa === 'selecao-nivel'" class="flex flex-col gap-6">
       
-      <h1 class="text-lg text-white text-center bg-elorepx-purple-700 rounded-t-3xl p-3" >Escolha a quantidade de questões</h1>
-
-      <div class="flex flex-col gap-3 border rounded-b-3xl p-4">
-        <button
-          v-for="qtd in OPCOES_QUANTIDADE"
-          :key="qtd"
-          :disabled="carregando"
-          class="border rounded-lg px-4 py-3 text-left"
-          :class="quantidade === qtd ? 'bg-elorepx-purple-500 text-white border-elorepx-purple-950 border-2' : 'bg-transparent'"
-          @click="quantidade = qtd"
-        >
-          {{ qtd }} questões
-       </button>
-      </div>
-    
-      <h1 class="text-lg text-white text-center bg-elorepx-purple-700 rounded-t-3xl p-3 mt-8">Escolha o nível - {{ olimpiadaEscolhida?.nome }}</h1>
-      
-      <div class="flex flex-col gap-3 border rounded-b-3xl p-4">
-        <template v-if="niveis.length > 1">
-          <button
-            v-for="nivel in niveis"
-            :key="nivel.id"
-            :disabled="carregando"
-            class="border rounded-lg px-4 py-3 text-left"
-            :class="nivelEscolhido === nivel ? 'bg-elorepx-purple-500 text-white border-elorepx-purple-950 border-2' : 'bg-transparent'"
-            @click="nivelEscolhido = nivel"
-          >
-            <span class="font-semibold">{{ nivel.nome }}</span>
-            <span v-if="nivel.descricao" class="block text-sm" :class="nivelEscolhido === nivel ? 'text-gray-100' : 'text-gray-500'">{{ nivel.descricao }}</span>
-          </button>
-        </template>
-
-        <div v-else-if="nivelEscolhido" class="p-3 bg-purple-50 border border-purple-200 rounded-lg text-center">
-          <p class="font-semibold text-elorepx-purple-700">Nível único: {{ nivelEscolhido.nome }}</p>
-          <p v-if="nivelEscolhido.descricao" class="text-sm text-gray-600 mt-1">{{ nivelEscolhido.descricao }}</p>
+      <div class="bg-white border rounded-2xl overflow-hidden shadow-sm">
+        <div class="bg-elorepx-purple-700 text-white text-center p-3.5">
+          <h2 class="text-base">Escolha a quantidade de questões</h2>
+          <!-- <p class="text-xs text-purple-200 mt-0.5">Escolha quantas questões quer responder</p> -->
         </div>
 
-        <p v-if="!nivelEscolhido" class="text-center text-gray-500">*Escolha um nível para iniciar o quiz</p>
+        <div class="p-4 bg-gray-50/50">
+          <div class="grid grid-cols-3 gap-2.5">
+            <button
+              v-for="qtd in OPCOES_QUANTIDADE"
+              :key="qtd"
+              :disabled="carregando"
+              class="py-3 px-2 rounded-xl text-sm border-2"
+              :class="quantidade === qtd 
+                ? 'border-elorepx-purple-600 bg-purple-50/80 shadow-sm font-medium' 
+                : 'bg-white text-gray-700 border-gray-200'"
+              @click="quantidade = qtd"
+            >
+              {{ qtd }} questões
+            </button>
+          </div>
+        </div>
+      </div>
+    
+      <div class="bg-white border rounded-2xl overflow-hidden shadow-sm">
+        <div class="bg-elorepx-purple-700 text-white text-center p-3.5 flex justify-between items-center px-5">
+          <h2 class="text-sm font-bold">Nível - {{ olimpiadaEscolhida?.nome }}</h2>
+          <button 
+            @click="etapa = 'selecao'" 
+            class="text-xs text-purple-200 hover:text-white underline font-medium"
+          >
+            Trocar olimpíada
+          </button>
+        </div>
+
+        <div class="p-4 flex flex-col gap-3">
+          <template v-if="niveis.length > 1">
+            <button
+              v-for="nivel in niveis"
+              :key="nivel.id"
+              :disabled="carregando"
+              class="border-2 rounded-xl p-3.5 text-left transition-all flex flex-col gap-0.5"
+              :class="nivelEscolhido?.id === nivel.id 
+                ? 'border-elorepx-purple-600 bg-purple-50/80 shadow-sm' 
+                : 'border-gray-200 hover:border-purple-200 bg-white'"
+              @click="nivelEscolhido = nivel"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-800 text-sm">{{ nivel.nome }}</span>
+                <span v-if="nivelEscolhido?.id === nivel.id" class="text-elorepx-purple-600 text-xs font-bold">Selecionado</span>
+              </div>
+              <span v-if="nivel.descricao" class="text-xs text-gray-500 leading-relaxed">{{ nivel.descricao }}</span>
+            </button>
+          </template>
+
+          <!-- Nível Único -->
+          <div v-else-if="nivelEscolhido" class="p-4 bg-purple-50/80 border border-purple-200 rounded-xl text-center">
+            <p class="font-bold text-elorepx-purple-800 text-sm">Nível Único: {{ nivelEscolhido.nome }}</p>
+            <p v-if="nivelEscolhido.descricao" class="text-xs text-gray-600 mt-1">{{ nivelEscolhido.descricao }}</p>
+          </div>
+        </div>
       </div>
 
-    <ButtonPrimary
-      v-if="nivelEscolhido"
-      :texto="'Iniciar'"
-      @click="iniciarSimulado(nivelEscolhido.id)"
-      class="mt-4"
-    />
+      <!-- Botão de Ação Principal -->
+      <ButtonPrimary
+        v-if="nivelEscolhido"
+        :texto="'Iniciar Quiz'"
+        @click="iniciarSimulado(nivelEscolhido.id)"
+        class="w-full py-3.5 text-base shadow-md"
+      />
     </section>
 
-    <section v-else-if="etapa === 'respondendo' && questaoAtual">
-      <p class="text-sm text-gray-500">
-        Questão {{ indiceAtual + 1 }} de {{ questoes.length }} — {{ olimpiadaEscolhida?.nome }}
-      </p>
-      <h2 class="font-semibold mt-2 text-lg">{{ questaoAtual.enunciado }}</h2>
+    <!-- seção de resposta -->
+    <section v-else-if="etapa === 'respondendo' && questaoAtual" class="flex flex-col gap-5">
+      <h1 class="text-elorepx-purple-600 font-bold font-inter border-b-2 text-lg">
+        {{ olimpiadaEscolhida?.nome }} - {{ nivelEscolhido?.nome }}
+      </h1>
+      <div class="bg-white p-4 rounded-2xl border border-gray-400 shadow-sm flex flex-col gap-3">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-bold text-gray-500">
+            Questão {{ indiceAtual + 1 }} de {{ questoes.length }}
+          </span>
+        </div>
 
-      <div class="flex flex-col gap-2 mt-4">
+        <!-- Barra de Progresso Roxa -->
+        <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+          <div 
+            class="bg-elorepx-purple-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+            :style="{ width: `${((indiceAtual + 1) / questoes.length) * 100}%` }"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Card do Enunciado -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-400 shadow-sm">
+        <div class="flex items-center gap-2 mb-2 text-xs font-semibold text-purple-600">
+          <span><BookMarkedIcon :size="20" /></span>
+          <span class="uppercase tracking-wider">{{ questaoAtual.assunto || 'Conhecimentos Gerais' }}</span>
+        </div>
+        <h2 class="font-bold text-elorepx-purple-950 text-base">
+          {{ questaoAtual.enunciado }}
+        </h2>
+      </div>
+
+      <!-- Lista de Alternativas -->
+      <div class="flex flex-col gap-3">
         <button
-          v-for="alt in questaoAtual.alternativas"
+          v-for="(alt, idx) in questaoAtual.alternativas"
           :key="alt.id"
-          class="border rounded-lg px-4 py-2 text-left"
-          :class="{ 'border-elorepx-purple-600 bg-elorepx-purple-50': respostas[questaoAtual.id] === alt.id }"
+          class="p-4 rounded-xl text-left border-2 flex items-start gap-3 relative"
+          :class="respostas[questaoAtual.id] === alt.id 
+            ? 'border-elorepx-purple-600 bg-purple-50/80 shadow-sm text-elorepx-purple-950 font-medium' 
+            : 'border-gray-200 hover:border-purple-200 bg-white text-gray-700'"
           @click="selecionarResposta(alt.id)"
         >
-          {{ alt.texto }}
+          <!-- Indicador da Letra (A, B, C, D...) -->
+          <span 
+            class="shrink-0 w-7 h-7 rounded-lg text-xs font-extrabold flex items-center justify-center"
+            :class="respostas[questaoAtual.id] === alt.id 
+              ? 'bg-elorepx-purple-600 text-white' 
+              : 'bg-gray-100 text-gray-600'"
+          >
+            {{ String.fromCharCode(65 + idx) }}
+          </span>
+
+          <!-- Texto da Alternativa -->
+          <span class="text-sm pt-0.5 leading-relaxed grow">{{ alt.texto }}</span>
         </button>
       </div>
 
+      <!-- Botão para Próxima Questão / Finalizar -->
       <button
-        class="mt-6 bg-elorepx-purple-600 text-white rounded-lg px-4 py-2 disabled:opacity-50"
+        class="w-full mt-2 bg-elorepx-purple-600 hover:bg-elorepx-purple-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         :disabled="!respostas[questaoAtual.id] || carregando"
         @click="proximaQuestao"
       >
-        {{ ehUltimaQuestao ? 'Finalizar' : 'Próxima' }}
+        <span>{{ ehUltimaQuestao ? 'Finalizar Simulado' : 'Próxima Questão' }}</span>
       </button>
+
     </section>
 
-    <section v-else-if="etapa === 'resultado' && resultado">
-      <h1 class="text-xl font-bold">
-        Resultado: {{ resultado.totalAcertos }} de {{ resultado.totalQuestoes }}
-      </h1>
+    <!-- seção de resultado -->
+    <section v-else-if="etapa === 'resultado' && resultado" class="flex flex-col gap-6 font-inter">
+
+      <!-- visão geral do desempenoho -->
+      <div class="bg-linear-to-br from-elorepx-purple-900 to-elorepx-purple-600 text-white p-6 rounded-3xl shadow-lg flex flex-col items-center text-center relative overflow-hidden">
+
+        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
+
+        <span class="text-xs tracking-widest font-base font-inter text-white mb-1">Simulado Concluído</span>
+        <h1 class="text-xl font-bold font-inter mb-4">Seu Desempenho</h1>
+
+        <div class="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/20 flex flex-col items-center justify-center mb-3 shadow-inner">
+          <span class="text-2xl font-bold leading-none">{{ Math.round((resultado.totalAcertos / resultado.totalQuestoes) * 100) }}%</span>
+          <span class="text-[10px] text-purple-200 font-base tracking-wider mt-1">Aproveitamento</span>
+        </div>
+
+        <p class="text-sm font-medium text-purple-100">
+          Você acertou <strong class="text-white font-extrabold">{{ resultado.totalAcertos }}</strong> de <strong class="text-white font-extrabold">{{ resultado.totalQuestoes }}</strong> questões
+        </p>
+
+        <div v-if="duracaoFormatada" class="mt-3 flex items-center gap-1.5 px-3 py-1 bg-black/20 rounded-full text-xs font-semibold text-purple-200 border border-white/10">
+          <Clock :size="15"/><span> Tempo: {{ duracaoFormatada }}</span>
+        </div>
+      </div>
 
       <div 
         v-if="resultado.resumoPorAssunto && Object.keys(resultado.resumoPorAssunto).length > 0" 
-        class="mb-8 p-4 bg-gray-50 rounded-xl border"
+        class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm"
       >
-        <h2 class="font-bold text-md mb-3 text-gray-800">Desempenho por Assunto</h2>
-        
-        <div class="flex flex-col gap-3">
-          <div v-for="(info, assunto) in resultado.resumoPorAssunto" :key="assunto">
-            
-            <div class="flex justify-between text-sm mb-1">
-              <span class="font-medium text-gray-700">{{ assunto }}</span>
-              <span class="text-gray-500">
+        <h2 class="font-extrabold text-gray-800 text-sm mb-4 flex items-center gap-2">
+          <ChartNoAxesCombined :size="20"/>
+          <span>Desempenho por Assunto</span>
+        </h2>
+
+        <div class="flex flex-col gap-3.5">
+          <div v-for="(info, assunto) in resultado.resumoPorAssunto" :key="assunto" class="flex flex-col gap-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-gray-700">{{ assunto }}</span>
+              <span class="font-bold" :class="(info.acertos / info.total) >= 0.7 ? 'text-green-600' : (info.acertos / info.total) >= 0.4 ? 'text-yellow-600' : 'text-red-600'">
                 {{ info.acertos }}/{{ info.total }} ({{ Math.round((info.acertos / info.total) * 100) }}%)
               </span>
             </div>
 
-            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
               <div 
                 class="h-2.5 rounded-full transition-all duration-500"
-                :class="(info.acertos / info.total) >= 0.7 
-                  ? 'bg-green-500' 
-                  : (info.acertos / info.total) >= 0.4 
-                    ? 'bg-yellow-500' 
-                    : 'bg-red-500'"
+                :class="(info.acertos / info.total) >= 0.7 ? 'bg-green-500' : (info.acertos / info.total) >= 0.4 ? 'bg-yellow-500' : 'bg-red-500'"
                 :style="{ width: `${(info.acertos / info.total) * 100}%` }"
               ></div>
             </div>
-
           </div>
         </div>
       </div>
 
-      <div v-for="(r, i) in resultado.resultados" :key="r.questao_id" class="mt-4 border-t pt-4">
-        <p class="font-semibold">
-          Questão {{ i + 1 }}:
-          <span :class="r.correta ? 'text-green-600' : 'text-red-600'">
-            {{ r.correta ? 'Acertou' : 'Errou' }}
-          </span>
-        </p>
+      <!-- DETALHAMENTO DE QUESTÃO POR QUESTÃO -->
+      <div class="flex flex-col gap-4">
+        <h2 class="font-extrabold text-gray-800 text-sm px-1 flex items-center gap-2">
+          <NotebookPen :size="15"/>
+          <span>Revisão do Gabarito</span>
+        </h2>
 
-        <template v-if="encontrarQuestao(r.questao_id)">
-          <p class="text-sm text-gray-700 mt-1">{{ encontrarQuestao(r.questao_id)!.enunciado }}</p>
+        <div 
+          v-for="(r, i) in resultado.resultados" 
+          :key="r.questao_id" 
+          class="bg-white p-5 rounded-2xl border transition-all shadow-sm flex flex-col gap-3"
+          :class="r.correta ? 'border-green-200/80 bg-green-50/20' : 'border-red-200/80 bg-red-50/20'"
+        >
+          <!-- Cabeçalho do Card da Questão -->
+          <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+            <span class="text-xs font-extrabold text-gray-500">Questão {{ i + 1 }}</span>
+            
+            <span 
+              class="px-2.5 py-0.5 rounded-full text-xs font-black flex items-center gap-1"
+              :class="r.correta ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"              
+            >
+            <!-- :class="r.correta ? 'border-green-700 border-2 text-green-700' : 'border-red-700 border-2 text-red-700'" -->
 
-          <p v-if="!r.correta" class="text-sm mt-1">
-            Sua resposta:
-            <span class="text-red-600">{{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, respostas[r.questao_id]) }}</span>
-          </p>
+              <span>{{ r.correta ? 'Correta' : 'Incorreta' }}</span>
+            </span>
+          </div>
 
-          <p class="text-sm mt-1">
-            Resposta correta:
-            <span class="text-green-600">{{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, r.resposta_correta) }}</span>
-          </p>
-        </template>
+          <!-- Enunciado e Respostas -->
+          <template v-if="encontrarQuestao(r.questao_id)">
+            <p class="text-sm font-semibold text-gray-800 leading-relaxed">
+              {{ encontrarQuestao(r.questao_id)!.enunciado }}
+            </p>
 
-        <p v-if="r.explicacao" class="text-sm text-gray-600 whitespace-pre-line mt-1">
-          {{ r.explicacao }}
-        </p>
+            <div class="text-xs flex flex-col gap-1.5 mt-1 pt-2 border-t border-gray-100/60">
+              <p v-if="!r.correta" class="text-red-700 border-2 border-red-700 p-2.5 rounded-lg bg-red-100">
+                <span class="font-bold block text-[10px] uppercase tracking-wider text-red-500">Sua Resposta:</span>
+                {{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, respostas[r.questao_id]) }}
+              </p>
 
-        <div class="mt-3">
-          <!-- Botão visível enquanto a curiosidade ainda não foi buscada nem está carregando -->
-          <button 
-            v-if="!curiosidades[r.questao_id] && !carregandoCuriosidade[r.questao_id]"
-            @click="buscarCuriosidade(r.questao_id, r.assunto)"
-            class="text-xs bg-purple-100 text-elorepx-purple-700 px-3 py-1.5 rounded-md hover:bg-purple-200 transition-colors font-medium flex items-center gap-1"
-          >
-            <span>💡 Onde isso aparece no cotidiano?</span>
-          </button>
+              <p class="text-green-800 boder-green-700 p-2.5 rounded-lg border-2 bg-green-100">
+                <span class="font-bold block text-[10px] uppercase tracking-wider text-green-600">Resposta Correta:</span>
+                {{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, r.resposta_correta) }}
+              </p>
+            </div>
+          </template>
 
-          <!-- Indicador visual de carregamento (RNF-06: Usabilidade durante resposta do LLM) -->
-          <p v-if="carregandoCuriosidade[r.questao_id]" class="text-xs text-gray-500 animate-pulse">
-            Consultando IA sobre o cotidiano...
-          </p>
+          <!-- Explicação Pedagógica Complementar (RF-15) -->
+          <div v-if="r.explicacao" class="mt-1 p-3.5 bg-purple-50/80 rounded-xl border border-purple-100 text-xs text-purple-950">
+            <span class="font-bold text-elorepx-purple-700 mb-1 flex items-center gap-1">
+              <Brain :size="15"/>
+              <span>Explicação do Gabarito:</span>
+            </span>
+            <p class="whitespace-pre-line leading-relaxed text-gray-700">{{ r.explicacao }}</p>
+          </div>
 
-          <!-- Exibição do Card com a Curiosidade Retornada pela IA -->
-          <div v-if="curiosidades[r.questao_id]" class="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900">
-            <span class="font-bold text-amber-800 block mb-1">💡 Ciência no Cotidiano:</span>
-            <p>{{ curiosidades[r.questao_id] }}</p>
+          <div class="mt-1">
+            <button 
+              v-if="!curiosidades[r.questao_id] && !carregandoCuriosidade[r.questao_id]"
+              @click="buscarCuriosidade(r.questao_id, r.assunto)"
+              class="w-full text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 px-3.5 py-2.5 rounded-xl transition-all font-bold flex items-center justify-center gap-1.5 shadow-sm"
+            >
+              <Lightbulb :size="15"/> <span> Onde isso aparece no cotidiano?</span>
+            </button>
+
+            <!-- Loading State (RNF-06) -->
+            <div v-if="carregandoCuriosidade[r.questao_id]" class="p-3 bg-amber-50/50 rounded-xl border border-amber-100 text-center">
+              <p class="text-xs text-amber-700 font-semibold animate-pulse flex items-center justify-center gap-2">
+                <Hourglass class="animate-spin" />
+                <span>Consultando IA sobre o cotidiano...</span>
+              </p>
+            </div>
+
+            <!-- Conteúdo Retornado da IA -->
+            <div v-if="curiosidades[r.questao_id]" class="p-3.5 bg-amber-50 rounded-xl border border-amber-200/80 text-xs text-amber-900 shadow-sm">
+              <span class="font-extrabold text-amber-800 mb-1 flex items-center gap-1">
+                <Lightbulb :size="15"/>
+                <span>Ciência no Cotidiano:</span>
+              </span>
+              <p class="leading-relaxed text-amber-950">{{ curiosidades[r.questao_id] }}</p>
+            </div>
           </div>
         </div>
-
       </div>
 
-      <p>Tempo gasto: {{ duracaoFormatada }}</p>
-      <button class="mt-6 bg-elorepx-purple-600 text-white rounded-lg px-4 py-2" @click="voltarParaSimulados">
-        Voltar para simulados
-      </button>
+      <!-- Botão Voltar -->
+       <ButtonPrimary 
+        :texto="'Voltar para simulados'"
+        class="w-full py-3 shadow-md transition-all duration-200 mt-2 mb-6"
+        @click="voltarParaSimulados"
+        />
+        
     </section>
 
     <p v-if="carregando" class="text-sm text-gray-500 mt-4 text-center">Carregando...</p>
