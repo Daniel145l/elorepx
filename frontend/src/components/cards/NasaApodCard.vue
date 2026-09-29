@@ -26,8 +26,9 @@ const aberto = ref(false)
       </button>
       <img v-if="apod.media_type === 'image' && aberto" :src="apod.url" :alt="apod.title != 'indefinido' ? apod.title : apod.explanation">
       <a v-else-if="apod.media_type != 'image' && aberto" :href="apod.url" target="_blank" rel="noopener noreferrer" class="text-center inline-block w-full underline">Ver vídeo da NASA</a>
-      <h4 v-if="apod.title != 'indefinido' && aberto" class="font-bold capitalize text-left">{{ apod.title }}</h4>
+      <h4 v-if="apod.title != 'indefinido' && aberto" class="font-bold capitalize text-center">{{ apod.title }}</h4>
       <p v-if="aberto" class="text-sm text-justify mt-3 whitespace-pre-line transition-all">{{ apod.explanation }}</p>
+      <!-- {{ apod.explanation }} -->
       <p v-if="apod.copyright && aberto" class="text-sm text-justify mt-3 whitespace-pre-line transition-all">Créditos: {{ apod.copyright }}</p>
     </div>
   </article>
