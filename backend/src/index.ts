@@ -22,7 +22,7 @@ app.use('/api/ia', iaRouter)
 app.use('/api/curiosidade-do-dia', curiosidadeDoDiaRouter)
 app.use('/api/conteudo', conteudoDinamicoRouter)
 app.use('/api/quiz', quizRouter)
-app.use('/niveis', gamificacaoRouter)
+app.use('/api/gamificacao', gamificacaoRouter)
 
  app.listen(PORT, () => {
   console.log(`backend rodando em http://localhost${PORT}`)
