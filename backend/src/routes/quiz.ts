@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { llmClient } from "../lib/llm/index.js"
+import { calcularNivelNarrativo } from '../lib/niveis.js'
 import { supabaseAdmin } from "../lib/supabaseAdmin.js"
 import { AuthenticatedRequest, requireAuth } from "../middleware/requireAuth.js"
 
@@ -96,23 +97,6 @@ quizRouter.get('/questoes', async(req, res) => {
   }
 
 const XP_POR_ACERTO = 10
-
-const NIVEIS_NARRATIVOS = [
-  { nome: 'Aspirante', xpMinimo: 0 },
-  { nome: 'Explorador', xpMinimo: 50 },
-  { nome: 'Olimpista', xpMinimo: 150 },
-  { nome: 'Cientista', xpMinimo: 350 },
-]
-
-function calcularNivelNarrativo(xp: number): string {
-  let nivel = NIVEIS_NARRATIVOS[0].nome
-
-  for(const n of NIVEIS_NARRATIVOS) {
-    if(xp >= n.xpMinimo) nivel = n.nome
-  }
-
-  return nivel
-}
 
 interface ConquistaNova {
   codigo: string,

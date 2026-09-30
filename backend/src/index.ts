@@ -3,6 +3,7 @@ import 'dotenv/config'
 import express from 'express'
 import { conteudoDinamicoRouter } from './routes/conteudoDinamico.js'
 import { curiosidadeDoDiaRouter } from './routes/curiosidadeDoDia.js'
+import { gamificacaoRouter } from './routes/gamificacao.js'
 import { iaRouter } from './routes/ia.js'
 import { quizRouter } from './routes/quiz.js'
 
@@ -21,6 +22,7 @@ app.use('/api/ia', iaRouter)
 app.use('/api/curiosidade-do-dia', curiosidadeDoDiaRouter)
 app.use('/api/conteudo', conteudoDinamicoRouter)
 app.use('/api/quiz', quizRouter)
+app.use('/niveis', gamificacaoRouter)
 
  app.listen(PORT, () => {
   console.log(`backend rodando em http://localhost${PORT}`)
