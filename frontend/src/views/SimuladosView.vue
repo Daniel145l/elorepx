@@ -5,11 +5,12 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
 import { useAuthFetch } from '@/composables/useAuthFetch';
 import { useSupabaseList } from '@/composables/useSupabaseList';
 import { supabase } from '@/lib/supabase';
-import { BookMarkedIcon, Brain, ChartNoAxesCombined, Clock, FlaskConicalIcon, Hourglass, Lightbulb, MicroscopeIcon, NotebookPen, Rocket, ZapIcon } from 'lucide-vue-next';
+import { Award, BookMarkedIcon, Brain, ChartNoAxesCombined, ChevronDown, ChevronUp, Clock, FlaskConicalIcon, Hourglass, Lightbulb, MicroscopeIcon, NotebookPen, Rocket, Trophy, ZapIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 
 type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo' | 'resultado'
+
 
  interface Alternativa {
   id: string;
@@ -31,9 +32,22 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
   explicacao: string | null
  }
 
+ interface ConquistaNova {
+  codigo: string
+  nome: string
+ }
+
+ interface GamificacaoResult {
+  xpGanho: number,
+  nivelAtual: string,
+  subiuDeNivel: boolean
+  conquistasNovas: ConquistaNova[]
+ }
+
  interface ResultadoFinal {
   resultados: ResultadoQuestao[];
   resumoPorAssunto: Record<string, { acertos: number, total: number }>;
+  gamificacao?: GamificacaoResult,
   totalAcertos: number;
   totalQuestoes: number
  }
@@ -446,9 +460,10 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
         <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
 
         <span class="text-xs tracking-widest font-base font-inter text-white mb-1">Simulado Concluído</span>
-        <h1 class="text-xl font-bold font-inter mb-4">Seu Desempenho</h1>
+        <h1 class="text-xl font-bold font-inter">Seu Desempenho</h1>
 
-        <div class="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/20 flex flex-col items-center justify-center mb-3 shadow-inner">
+        <div class="py-8 flex flex-col">
+          <!-- class="w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border-2 border-white/20 flex flex-col items-center justify-center mb-3 shadow-inner" -->
           <span class="text-2xl font-bold leading-none">{{ Math.round((resultado.totalAcertos / resultado.totalQuestoes) * 100) }}%</span>
           <span class="text-[10px] text-purple-200 font-base tracking-wider mt-1">Aproveitamento</span>
         </div>
@@ -487,7 +502,38 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
                 :style="{ width: `${(info.acertos / info.total) * 100}%` }"
               ></div>
             </div>
+
+            <div class="flex justify-between items-center text-sm mt-2">
+              <span class="font-bold text-green-800">+ {{ resultado.gamificacao?.xpGanho }}xp</span>
+              <div class="flex gap-1 items-center">
+                <Trophy :size="15" v-if="!resultado.gamificacao?.subiuDeNivel"/>
+                <ChevronUp :size="15" v-if="resultado.gamificacao?.subiuDeNivel" />
+                <span>
+                  {{ resultado.gamificacao?.nivelAtual }}
+                </span>
+              </div>
+            </div>
+
           </div>
+        </div>
+      </div>
+
+      <div v-if="resultado.gamificacao?.conquistasNovas && resultado.gamificacao?.conquistasNovas.length > 0" class="bg-amber-50 p-5 rounded-2xl shadow-[0px_0px_2px_0px_#a65f00] flex flex-col gap-1">
+        <div class="flex items-center gap-1">
+          <Award :size="17" class="text-yellow-800"/>
+          <h4 class="text-sm font-bold text-yellow-700">
+            Conquistas desbloqueadas:
+          </h4>
+        </div>
+        <div
+          class="flex"
+          v-for="conquista in resultado.gamificacao?.conquistasNovas"
+          :key="conquista.codigo"
+        >
+        <span class="text-sm">
+          + {{ conquista.nome }}
+            <!-- Primeiros Passos -->
+        </span>
         </div>
       </div>
 
@@ -504,8 +550,7 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
           class="bg-white p-5 rounded-2xl border transition-all shadow-sm flex flex-col gap-3"
           :class="r.correta ? 'border-green-200/80 bg-green-50/20' : 'border-red-200/80 bg-red-50/20'"
         >
-          <!-- Cabeçalho do Card da Questão -->
-          <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+          <div class="flex justify-between items-center pb-2 border-gray-100">
             <span class="text-xs font-extrabold text-gray-500">Questão {{ i + 1 }}</span>
             
             <span 
@@ -526,12 +571,12 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
 
             <div class="text-xs flex flex-col gap-1.5 mt-1 pt-2 border-t border-gray-100/60">
               <p v-if="!r.correta" class="text-red-700 border-2 border-red-700 p-2.5 rounded-lg bg-red-100">
-                <span class="font-bold block text-[10px] uppercase tracking-wider text-red-500">Sua Resposta:</span>
+                <span class="font-bold block text-[10px] tracking-wider text-red-500">Sua Resposta:</span>
                 {{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, respostas[r.questao_id]) }}
               </p>
 
               <p class="text-green-800 boder-green-700 p-2.5 rounded-lg border-2 bg-green-100">
-                <span class="font-bold block text-[10px] uppercase tracking-wider text-green-600">Resposta Correta:</span>
+                <span class="font-bold block text-[10px] tracking-wider text-green-600">Resposta Correta:</span>
                 {{ textoDaAlternativa(encontrarQuestao(r.questao_id)!, r.resposta_correta) }}
               </p>
             </div>
@@ -550,20 +595,18 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
             <button 
               v-if="!curiosidades[r.questao_id] && !carregandoCuriosidade[r.questao_id]"
               @click="buscarCuriosidade(r.questao_id, r.assunto)"
-              class="w-full text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 px-3.5 py-2.5 rounded-xl transition-all font-bold flex items-center justify-center gap-1.5 shadow-sm"
+              class="w-full text-xs text-amber-800 border border-amber-200/80 px-3.5 py-2.5 rounded-xl transition-all font-bold flex items-center justify-center gap-1.5"
             >
-              <Lightbulb :size="15"/> <span> Onde isso aparece no cotidiano?</span>
+              <Lightbulb :size="15"/> <span> Onde isso aparece no cotidiano?</span> <ChevronDown />
             </button>
 
-            <!-- Loading State (RNF-06) -->
-            <div v-if="carregandoCuriosidade[r.questao_id]" class="p-3 bg-amber-50/50 rounded-xl border border-amber-100 text-center">
+            <div v-if="carregandoCuriosidade[r.questao_id]" class="w-full text-xs text-amber-800 border border-amber-200/80 px-3.5 py-2.5 rounded-xl transition-all font-bold flex items-center justify-center gap-1.5">
               <p class="text-xs text-amber-700 font-semibold animate-pulse flex items-center justify-center gap-2">
-                <Hourglass class="animate-spin" />
+                <Hourglass class="animate-spin" :size="15"/>
                 <span>Consultando IA sobre o cotidiano...</span>
               </p>
             </div>
 
-            <!-- Conteúdo Retornado da IA -->
             <div v-if="curiosidades[r.questao_id]" class="p-3.5 bg-amber-50 rounded-xl border border-amber-200/80 text-xs text-amber-900 shadow-sm">
               <span class="font-extrabold text-amber-800 mb-1 flex items-center gap-1">
                 <Lightbulb :size="15"/>
