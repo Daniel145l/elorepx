@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
+import CuriosityCard from '@/components/cards/CuriosityCard.vue';
 import MissionCard from '@/components/cards/MissionCard.vue';
 import PowerCard from '@/components/cards/PowerCard.vue';
 import Header from '@/components/header/Header.vue';
@@ -9,6 +9,8 @@ import TitlePrimary from '@/components/titles/TitlePrimary.vue';
 import { Brain, Eye, HatGlasses } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 
+import NasaApodCard from '@/components/cards/NasaApodCard.vue';
+import ApresentationSection from '@/components/sections/ApresentationSection.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const auth = useAuthStore()
@@ -28,17 +30,24 @@ async function handleSubmit() {
 <template>
   <Header />
 
-  <section class="mt-6 px-5 relative">
+  <!-- 
+  Olá, investigador de código-fonte!
+  Queria deixar um agradecimento especial à alguém também muito especial:
+  Agradeço a sophia por me ajudar em todos os momentos a fazer essa plataforma! Esperamos que vocês gostem 
+  -->
+
+  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'"/>
+  <!-- <section class="mt-6 px-5 relative">
     <div class="relative">
       <img src="/background-home.svg" alt="" class="relative w-full">
       <div class="absolute top-[50%] flex flex-col items-center translate-y-[-50%] gap-5 px-4 text-center w-full">
         <h1 class="text-white text-center font-display text-xl">Vire um cientista e venha explorar o mundo que está a sua volta</h1>
-        <RouterLink to="/cadastrar" class="w-[40%]">
+        <RouterLink to="/cadastro" class="w-[40%]">
           <ButtonPrimary :texto="'Explorar'" class="w-full text-sm"/>
         </RouterLink>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <section class="px-5 my-12">
     <!-- <div class="bg-[url(/fita.svg)] bg-center bg-contain bg-no-repeat w-full h-21.25">
@@ -73,12 +82,16 @@ async function handleSubmit() {
 
   <ReportsSection />
 
-  <section class="px-5">
-    <TitlePrimary texto="A ciência no dia a dia"/>
-    
+  <section class="px-5 mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
+    <TitlePrimary texto="A ciência no dia a dia" class="text-white"/>
+    <CuriosityCard />
+    <NasaApodCard />
   </section>
 
   <ScientistsSection />
 
-  <button @click="handleSubmit">Sair</button>
+  <button @click="handleSubmit">Sair</button> </br>
+  <RouterLink to="/simulados">
+    simulados
+  </RouterLink>
 </template>

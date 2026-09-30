@@ -42,6 +42,10 @@ const TEMAS_COTIDIANO = [
   'como os foguetes conseguem chegar ao espaço',
 ]
 
+function dataDeHojeNoBrasil(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
+}
+
 function temaDoDia(): string {
   const diaDoAno = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
@@ -50,10 +54,10 @@ function temaDoDia(): string {
 }
 
 curiosidadeDoDiaRouter.get('/', async(req, res) => {
-  const hoje = new Date().toISOString().slice(0, 10)
+  const hoje = dataDeHojeNoBrasil()
 
   const { data: existente } = await supabaseAdmin
-    .from('curiosidade')
+    .from('curiosidade_do_dia')
     .select('tema, texto')
     .eq('data', hoje)
     .maybeSingle()
@@ -63,8 +67,7 @@ curiosidadeDoDiaRouter.get('/', async(req, res) => {
   try {
     const tema = temaDoDia()
     const prompt = `Explique de forma simples e envolvente, para um estudante de ensino fundamental/médio, a seguinte curiosidade científica do cotidiano: "${tema}". Máximo 3 parágrafos curtos.`
-    const texto = await llmClient.gerarTexto(prompt)   // ← igual ia.ts, mesma ideia
-
+    const texto = await llmClient.gerarTexto(prompt)
     const { data: nova, error } = await supabaseAdmin
       .from('curiosidade_do_dia')
       .insert({ data: hoje, tema, texto })
