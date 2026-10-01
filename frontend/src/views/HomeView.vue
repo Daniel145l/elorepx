@@ -36,7 +36,7 @@ async function handleSubmit() {
   Agradeço a sophia por me ajudar em todos os momentos a fazer essa plataforma! Esperamos que vocês gostem 
   -->
 
-  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'"/>
+  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'" :link="'olimpiadas'"/>
   <!-- <section class="mt-6 px-5 relative">
     <div class="relative">
       <img src="/background-home.svg" alt="" class="relative w-full">
