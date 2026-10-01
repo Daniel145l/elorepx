@@ -3,8 +3,9 @@ import LevelCard from '@/components/cards/LevelCard.vue'
 import StatsCard from '@/components/cards/StatsCard.vue'
 import Header from '@/components/header/Header.vue'
 import { supabase } from '@/lib/supabase'
+import { router } from '@/router'
 import { useAuthStore } from '@/stores/auth'
-import { Award, Flame, Lock, Trophy, Zap } from 'lucide-vue-next'
+import { Award, Flame, Lock, LogOut, Trophy, Zap } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 
 interface Perfil {
@@ -95,6 +96,15 @@ const progresso = computed(() => {
 function formatarData(dataIso: string): string {
   return new Date(dataIso).toLocaleDateString('pt-BR')
 }
+
+async function handleSubmit() {
+  try {
+    await auth.signOut()
+    router.push({ name: 'login' })
+  } catch {
+
+  }
+}
 </script>
 
 <template>
@@ -106,9 +116,18 @@ function formatarData(dataIso: string): string {
     <p v-else-if="erro" class="text-center text-red-600">{{ erro }}</p>
 
     <template v-else-if="perfil">
-      <div class="flex gap-1">
-        <h2 class="text-xl">Olá,</h2>
-        <h2 class="font-bold text-elorepx-purple-700 text-xl">{{ perfil.nickname }}</h2>
+      <div class="flex justify-between items-center">
+        <div class="flex gap-1">
+          <h2 class="text-xl">Olá,</h2>
+          <h2 class="font-bold text-elorepx-purple-700 text-xl">{{ perfil.nickname }}</h2>
+        </div>
+        <div 
+          class="flex gap-1 items-center bg-red-100 p-2 border border-red-300 rounded-xl text-red-800"
+          @click="handleSubmit"
+        >
+          <LogOut :size="15"/>
+          <span class="uppercase text-xs">Sair</span>
+        </div>
       </div>
       <section class="mt-8">
         <div class="grid grid-cols-2 gap-2 align-middle">
@@ -155,44 +174,12 @@ function formatarData(dataIso: string): string {
         </div>
       </section>
       <!-- *FORMATAR A DATA <span>Por aqui desde {{ perfil.created_at }}</span> -->
-      <!-- <section class="bg-elorepx-purple-700 text-white rounded-2xl p-6 text-center">
-        <p class="text-sm opacity-80">{{ perfil.nickname }}</p>
-        <p class="text-sm mt-1">{{ perfil.xp }} XP</p>
-        
-        <div v-if="progresso" class="mt-4">
-          <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-            <div class="bg-white h-full" :style="{ width: progresso.percentual + '%' }" />
-          </div>
-          <p v-if="progresso.proximoNome" class="text-xs mt-2 opacity-80">
-            Faltam {{ progresso.faltam }} XP para {{ progresso.proximoNome }}
-          </p>
-          <p v-else class="text-xs mt-2 opacity-80">Nível máximo alcançado</p>
-        </div>
-        <h1 class="text-2xl font-bold mt-1">{{ perfil.nivel_narrativo }}</h1>
-
-        <p class="text-xs mt-4 opacity-80">
-          🔥 {{ perfil.sequencia_dias }} {{ perfil.sequencia_dias === 1 ? 'dia seguido' : 'dias seguidos' }} de estudo
-        </p>
-      </section>
-
-      <section class="mt-8">
-        <h2 class="font-bold text-gray-800 mb-4">Medalhas</h2>
-        <div class="grid grid-cols-2 gap-3">
-          <div
-            v-for="medalha in catalogoMedalhas"
-            :key="medalha.codigo"
-            class="border rounded-xl p-4 text-center"
-            :class="codigosConquistados.has(medalha.codigo) ? 'border-elorepx-purple-600 bg-purple-50' : 'border-gray-200 opacity-50'"
-          >
-            <p class="text-2xl">{{ codigosConquistados.has(medalha.codigo) ? '🏅' : '🔒' }}</p>
-            <p class="text-sm font-semibold mt-1">{{ medalha.nome }}</p>
-            <p v-if="medalha.descricao" class="text-xs text-gray-500 mt-1">{{ medalha.descricao }}</p>
-            <p v-if="codigosConquistados.has(medalha.codigo)" class="text-xs text-elorepx-purple-700 mt-2">
-              Conquistada em {{ formatarData(dataConquista[medalha.codigo]) }}
-            </p>
-          </div>
-        </div>
-      </section> -->
     </template>
   </div>
+
+  <!-- * TODO - ALTERAR NICKNAME E SAIR
+   <section>
+    <h2 class="font-bold text-gray-800 mb-4">Configurações</h2>
+    <button @click="handleSubmit">Sair</button>
+  </section> -->
 </template>
