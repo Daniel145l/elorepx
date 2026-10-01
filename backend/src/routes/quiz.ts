@@ -1,5 +1,6 @@
 import { Router } from "express"
 import { llmClient } from "../lib/llm/index.js"
+import { calcularNivelNarrativo } from '../lib/niveis.js'
 import { supabaseAdmin } from "../lib/supabaseAdmin.js"
 import { AuthenticatedRequest, requireAuth } from "../middleware/requireAuth.js"
 
@@ -97,23 +98,6 @@ quizRouter.get('/questoes', async(req, res) => {
 
 const XP_POR_ACERTO = 10
 
-const NIVEIS_NARRATIVOS = [
-  { nome: 'Aspirante', xpMinimo: 0 },
-  { nome: 'Explorador', xpMinimo: 50 },
-  { nome: 'Olimpista', xpMinimo: 150 },
-  { nome: 'Cientista', xpMinimo: 350 },
-]
-
-function calcularNivelNarrativo(xp: number): string {
-  let nivel = NIVEIS_NARRATIVOS[0].nome
-
-  for(const n of NIVEIS_NARRATIVOS) {
-    if(xp >= n.xpMinimo) nivel = n.nome
-  }
-
-  return nivel
-}
-
 interface ConquistaNova {
   codigo: string,
   nome: string
@@ -170,35 +154,51 @@ async function atualizarXpNivelEConquista(
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
 
+  const totalCompletas = totalApos ?? 0
   const totalAntes = (totalApos ?? 0) - resultadosValidos.length
 
   const codigosParaConceder: string[] = []
 
-  if(totalAntes === 0) {
+  if(totalAntes === 0 && totalCompletas > 0) {
     codigosParaConceder.push('primeira_questao', 'primeiro_quiz')
   }
-  if(totalAntes < 100 && (totalApos ?? 0) >= 100 ) {
+
+  if(totalAntes < 100 && totalCompletas >= 100 ) {
     codigosParaConceder.push('100_questoes')
   }
+
   if(novaSequencia === 3) codigosParaConceder.push('sequencia_3_dias')
   if(novaSequencia === 7) codigosParaConceder.push('sequencia_7_dias')
   if(novaSequencia === 30) codigosParaConceder.push('sequencia_30_dias')
 
+  console.log('[quiz/corrigir] Códigos elegíveis para conceder:', codigosParaConceder, '| totalAntes:', totalAntes, '| totalApos:', totalCompletas)
+
   const conquistasNovas: ConquistaNova[] = []
 
   if(codigosParaConceder.length > 0) {
-    const { data: medalhas } = await supabaseAdmin
-      .from('medalha')
+    const { data: medalhas, error: erroBuscarMedalhas } = await supabaseAdmin
+      .from('medalhas')
       .select('id, codigo, nome')
       .in('codigo', codigosParaConceder)
 
-    for(const medalha of medalhas ?? []) {
-      const { error: erroMedalha } = await supabaseAdmin
-        .from('usuario_medalha')
-        .insert({ user_id: userId, medalha_id: medalha.id })
+    if (erroBuscarMedalhas || !medalhas || medalhas.length === 0) {
+      console.error('[quiz/corrigir] Nenhuma medalha encontrada no banco com os códigos:', codigosParaConceder, erroBuscarMedalhas)
+    } else {
+      for (const medalha of medalhas) {
+        const { error: erroMedalha } = await supabaseAdmin
+          .from('usuario_medalhas')
+          .insert({ user_id: userId, medalha_id: medalha.id })
 
-      if(!erroMedalha) {
-        conquistasNovas.push({ codigo: medalha.codigo, nome: medalha.nome })
+        if (erroMedalha) {
+          if (erroMedalha.code === '23505') {
+            console.log(`[quiz/corrigir] Utilizador já possui a medalha: ${medalha.codigo}`)
+          } else {
+            console.error(`[quiz/corrigir] Falha ao conceder medalha "${medalha.codigo}":`, erroMedalha)
+          }
+        } else {
+          console.log(`[quiz/corrigir] Medalha concedida com sucesso: ${medalha.nome}`)
+          conquistasNovas.push({ codigo: medalha.codigo, nome: medalha.nome })
+        }
       }
     }
   }

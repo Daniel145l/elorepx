@@ -89,8 +89,6 @@ async function handleSubmit() {
   </section>
 
   <ScientistsSection />
-
-  <button @click="handleSubmit">Sair</button> </br>
   <RouterLink to="/simulados">
     simulados
   </RouterLink>

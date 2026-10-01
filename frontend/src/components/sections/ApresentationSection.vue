@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ButtonPrimary from '../buttons/ButtonPrimary.vue';
+
 defineProps<{
   text: string
   textButton?: string
@@ -13,7 +15,7 @@ defineProps<{
       <div class="absolute top-[50%] flex flex-col items-center translate-y-[-50%] gap-5 px-4 text-center w-full">
         <h1 class="text-white text-center font-display text-xl">{{ text }}</h1>
         <p v-if="textDescription" class="text-white text-sm">{{ textDescription }}</p>
-        <ButtonPrimary v-if="textButton" :texto="textButton" class="w-full text-sm"/>
+        <ButtonPrimary v-if="textButton" :texto="textButton" class="w-[50%] text-sm"/>
       </div>
     </div>
   </section>
