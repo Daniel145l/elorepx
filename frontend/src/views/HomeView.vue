@@ -7,23 +7,9 @@ import ReportsSection from '@/components/sections/ReportsSection.vue';
 import ScientistsSection from '@/components/sections/ScientistsSection.vue';
 import TitlePrimary from '@/components/titles/TitlePrimary.vue';
 import { Brain, Eye, HatGlasses } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
 
 import NasaApodCard from '@/components/cards/NasaApodCard.vue';
 import ApresentationSection from '@/components/sections/ApresentationSection.vue';
-import { useAuthStore } from '@/stores/auth';
-
-const auth = useAuthStore()
-const router = useRouter()
-
-async function handleSubmit() {
-  try {
-    await auth.signOut()
-    router.push({ name: 'login' })
-  } catch {
-
-  }
-}
 
 </script>
 
