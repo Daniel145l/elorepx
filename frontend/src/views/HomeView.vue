@@ -2,33 +2,18 @@
 import CuriosityCard from '@/components/cards/CuriosityCard.vue';
 import MissionCard from '@/components/cards/MissionCard.vue';
 import PowerCard from '@/components/cards/PowerCard.vue';
-import Header from '@/components/header/Header.vue';
 import ReportsSection from '@/components/sections/ReportsSection.vue';
 import ScientistsSection from '@/components/sections/ScientistsSection.vue';
 import TitlePrimary from '@/components/titles/TitlePrimary.vue';
 import { Brain, Eye, HatGlasses } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
 
 import NasaApodCard from '@/components/cards/NasaApodCard.vue';
 import ApresentationSection from '@/components/sections/ApresentationSection.vue';
-import { useAuthStore } from '@/stores/auth';
-
-const auth = useAuthStore()
-const router = useRouter()
-
-async function handleSubmit() {
-  try {
-    await auth.signOut()
-    router.push({ name: 'login' })
-  } catch {
-
-  }
-}
 
 </script>
 
 <template>
-  <Header />
+  <!-- <Header /> -->
 
   <!-- 
   Olá, investigador de código-fonte!
@@ -36,7 +21,7 @@ async function handleSubmit() {
   Agradeço a sophia por me ajudar em todos os momentos a fazer essa plataforma! Esperamos que vocês gostem 
   -->
 
-  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'"/>
+  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'" :link="'olimpiadas'"/>
   <!-- <section class="mt-6 px-5 relative">
     <div class="relative">
       <img src="/background-home.svg" alt="" class="relative w-full">
@@ -89,8 +74,6 @@ async function handleSubmit() {
   </section>
 
   <ScientistsSection />
-
-  <button @click="handleSubmit">Sair</button> </br>
   <RouterLink to="/simulados">
     simulados
   </RouterLink>

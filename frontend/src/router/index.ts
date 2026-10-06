@@ -7,7 +7,9 @@ export const router = createRouter({
     { path: "/", name: "home", component: () => import("@/views/HomeView.vue") },
     { path: "/login", name: "login", component: () => import("@/views/LoginView.vue"), meta: { guestOnly: true } },
     { path: "/cadastro", name: "cadastro", component: () => import("@/views/CadastroView.vue"), meta: { guestOnly: true } },
-    { path: "/simulados", name: "simulados", component: () =>  import("@/views/SimuladosView.vue"), meta: { requiresAuth: true }}
+    { path: "/simulados", name: "simulados", component: () =>  import("@/views/SimuladosView.vue"), meta: { requiresAuth: true }},
+    { path: '/perfil', name: 'perfil', component: () => import('@/views/ProfileView.vue'), meta: { requiresAuth: true } },
+    { path: '/olimpiadas', name: 'olimpiadas', component: () => import('@/views/OlimpiadasView.vue') }
   ]
 });
 
