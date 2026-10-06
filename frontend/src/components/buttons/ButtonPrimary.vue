@@ -1,11 +1,13 @@
 <script setup lang="ts">
 const props = defineProps<{ 
   texto: string,
-  link: string
+  link?: string
  }>()
 
 const handleClick = () => {
-  window.location.href = props.link
+  if (props.link) {
+    window.location.href = props.link
+  }
 }
 </script>
 
