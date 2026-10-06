@@ -135,6 +135,8 @@ async function atualizarXpNivelEConquista(
   const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
   const ontem = new Date(Date.now() - 86400000).toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
 
+
+  //!CHAMAR QUANDO ENTRA NO SITE NÃO QUANDO RESPONDE UM QUIZ
   let novaSequencia = 0
   if(perfil.ultima_atividade === hoje) {
     novaSequencia = perfil.sequencia_dias
