@@ -111,7 +111,7 @@ function formatarData(dataIso: string): string {
           <h2 class="text-xl">Olá,</h2>
           <h2 class="font-bold text-elorepx-purple-700 text-xl">{{ perfil.nickname }}</h2>
         </div>
-        <ButtonLogOut />
+        <ButtonLogOut :texto="'Sair'"/>
       </div>
       <section class="mt-8">
         <div class="grid grid-cols-2 gap-2 align-middle">

@@ -1,6 +1,10 @@
 <script setup lang="ts">
+defineProps<{
+  texto: string
+}>()
 import { useAuthStore } from '@/stores/auth';
 import { LogOut } from 'lucide-vue-next';
+import { defineProps, } from 'vue';
 import { useRouter } from 'vue-router';
 
 const auth = useAuthStore()
@@ -18,6 +22,6 @@ async function sair() {
     @click="sair"
   >
     <LogOut :size="15"/>
-    <span class="uppercase text-xs">Sair</span>
+    <span class="uppercase text-xs">{{ texto }}</span>
   </button>
 </template>
