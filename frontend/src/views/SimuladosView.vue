@@ -1,6 +1,5 @@
 <script setup lang="ts">
  import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
-import Header from '@/components/header/Header.vue';
 import ApresentationSection from '@/components/sections/ApresentationSection.vue';
 import { useAuthFetch } from '@/composables/useAuthFetch';
 import { useSupabaseList } from '@/composables/useSupabaseList';
@@ -265,7 +264,7 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
 </script>
 
 <template>
-  <Header/>
+  <!-- <Header/> -->
 
   <ApresentationSection v-if="etapa != 'respondendo' && etapa != 'resultado'" :text="'Desvende o universo das questões'"/>
   <section class="max-w-xl mx-auto px-4 py-8">

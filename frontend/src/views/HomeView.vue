@@ -2,7 +2,6 @@
 import CuriosityCard from '@/components/cards/CuriosityCard.vue';
 import MissionCard from '@/components/cards/MissionCard.vue';
 import PowerCard from '@/components/cards/PowerCard.vue';
-import Header from '@/components/header/Header.vue';
 import ReportsSection from '@/components/sections/ReportsSection.vue';
 import ScientistsSection from '@/components/sections/ScientistsSection.vue';
 import TitlePrimary from '@/components/titles/TitlePrimary.vue';
@@ -14,7 +13,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
 </script>
 
 <template>
-  <Header />
+  <!-- <Header /> -->
 
   <!-- 
   Olá, investigador de código-fonte!

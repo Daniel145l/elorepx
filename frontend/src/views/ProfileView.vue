@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import LevelCard from '@/components/cards/LevelCard.vue'
 import StatsCard from '@/components/cards/StatsCard.vue'
-import Header from '@/components/header/Header.vue'
 import { supabase } from '@/lib/supabase'
 import { router } from '@/router'
 import { useAuthStore } from '@/stores/auth'
@@ -109,7 +108,7 @@ async function handleSubmit() {
 
 <template>
 
-  <Header />
+  <!-- <Header /> -->
 
   <div class="max-w-xl mx-auto px-4 py-8 font-inter">
     <p v-if="carregando" class="text-center text-gray-500">Carregando perfil...</p>
