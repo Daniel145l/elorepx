@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ButtonLogOut from '@/components/buttons/ButtonLogOut.vue'
+import RedButton from '@/components/buttons/RedButton.vue'
 import LevelCard from '@/components/cards/LevelCard.vue'
 import StatsCard from '@/components/cards/StatsCard.vue'
 import { supabase } from '@/lib/supabase'
@@ -111,7 +111,7 @@ function formatarData(dataIso: string): string {
           <h2 class="text-xl">Olá,</h2>
           <h2 class="font-bold text-elorepx-purple-700 text-xl">{{ perfil.nickname }}</h2>
         </div>
-        <ButtonLogOut :texto="'Sair'"/>
+        <RedButton :texto="'Sair'"/>
       </div>
       <section class="mt-8">
         <div class="grid grid-cols-2 gap-2 align-middle">
