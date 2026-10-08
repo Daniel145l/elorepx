@@ -74,7 +74,4 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
   </section>
 
   <ScientistsSection />
-  <RouterLink to="/simulados">
-    simulados
-  </RouterLink>
 </template>
