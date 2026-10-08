@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import RedButton from '@/components/buttons/RedButton.vue'
 import LevelCard from '@/components/cards/LevelCard.vue'
 import StatsCard from '@/components/cards/StatsCard.vue'
 import { supabase } from '@/lib/supabase'
-import { router } from '@/router'
 import { useAuthStore } from '@/stores/auth'
-import { Award, Flame, Lock, LogOut, Trophy, Zap } from 'lucide-vue-next'
+import { Award, Flame, Lock, Trophy, Zap } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 
 interface Perfil {
@@ -95,15 +95,6 @@ const progresso = computed(() => {
 function formatarData(dataIso: string): string {
   return new Date(dataIso).toLocaleDateString('pt-BR')
 }
-
-async function handleSubmit() {
-  try {
-    await auth.signOut()
-    router.push({ name: 'login' })
-  } catch {
-
-  }
-}
 </script>
 
 <template>
@@ -120,13 +111,7 @@ async function handleSubmit() {
           <h2 class="text-xl">Olá,</h2>
           <h2 class="font-bold text-elorepx-purple-700 text-xl">{{ perfil.nickname }}</h2>
         </div>
-        <div 
-          class="flex gap-1 items-center bg-red-100 p-2 border border-red-300 rounded-xl text-red-800"
-          @click="handleSubmit"
-        >
-          <LogOut :size="15"/>
-          <span class="uppercase text-xs">Sair</span>
-        </div>
+        <RedButton :texto="'Sair'"/>
       </div>
       <section class="mt-8">
         <div class="grid grid-cols-2 gap-2 align-middle">
