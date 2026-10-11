@@ -33,6 +33,7 @@ function fechar() {
     <RouterLink to="/" @click="fechar" class="">Home</RouterLink>
     <RouterLink to="/simulados" @click="fechar">Simulados</RouterLink>
     <RouterLink to="/olimpiadas" @click="fechar">Olimpíadas</RouterLink>
+    <RouterLink to="/cientistas" @click="fechar">Cientistas</RouterLink>
     
     <template v-if="auth.isAuthenticated">
       <BlueButton :texto="'Perfil'" :link="'perfil'" @click="fechar">
