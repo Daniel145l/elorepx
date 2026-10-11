@@ -73,5 +73,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     <NasaApodCard />
   </section>
 
-  <ScientistsSection />
+  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="mb-12 mx-5"/>
+
+  <ScientistsSection :limite="2"/>
 </template>
