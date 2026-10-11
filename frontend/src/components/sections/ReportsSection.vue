@@ -7,12 +7,14 @@ import { supabase } from '@/lib/supabase';
 interface Report {
   id: string,
   titulo: string,
+  nome_aluno: string,
   texto: string,
   fonte_url: string,
+  foto_url: string | null,
   fonte_nome: string
 }
 
-const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabase.from('relatos_alunos').select('id, titulo, texto, fonte_url, fonte_nome').limit(2))
+const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabase.from('relatos_alunos').select('id, titulo, nome_aluno, texto, fonte_url, foto_url, fonte_nome').limit(2))
 </script>
 
 <template>
