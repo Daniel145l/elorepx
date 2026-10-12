@@ -34,7 +34,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     </div>
   </section> -->
 
-  <section class="px-5 my-12">
+  <section class="page-container my-12">
     <!-- <div class="bg-[url(/fita.svg)] bg-center bg-contain bg-no-repeat w-full h-21.25">
       <h2>Desbloqueie novos poderes</h2>
     </div> -->

@@ -22,7 +22,7 @@ const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabas
 </script>
 
 <template>
-  <section class="px-5 mb-14">
+  <section class="page-container mb-14">
     <TitlePrimary :texto="'Eles também começaram assim!'" class="mb-12" />
 
     <p v-if="loading">Carregando...</p>

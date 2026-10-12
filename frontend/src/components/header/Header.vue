@@ -15,15 +15,17 @@ function fechar() {
 </script>
 
 <template>
-  <header class="flex justify-between items-center py-5 px-5 align-middle border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white">
-    <RouterLink to="/" @click="fechar">
-      <img src="/logo.svg" alt="Elorepx">
-    </RouterLink>
-
-    <button @click="aberto = !aberto" aria-label="Abrir menu">
-      <Menu v-if="!aberto" :size="20"/>
-      <X v-else :size="20" />
-    </button>
+  <header class="py-5 px-5 align-middle border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white">
+    <div class="flex justify-between items-center max-w-[1200px]">
+      <RouterLink to="/" @click="fechar">
+        <img src="/logo.svg" alt="Elorepx">
+      </RouterLink>
+  
+      <button @click="aberto = !aberto" aria-label="Abrir menu">
+        <Menu v-if="!aberto" :size="20"/>
+        <X v-else :size="20" />
+      </button>
+    </div>
 
   </header>
   <nav

@@ -21,7 +21,7 @@ const { items: cientistas, loading, error } = useSupabaseList<Scientist>(() => s
 </script>
 
 <template>
-  <section class="px-5 flex flex-col items-center">
+  <section class="page-container flex flex-col items-center">
     
     <p v-if="loading">Carregando...</p>
     <p v-else-if="error">Não foi possível carregar os cientistas agora. Tente novamente mais tarde</p>
