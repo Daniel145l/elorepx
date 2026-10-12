@@ -16,26 +16,54 @@ interface Questao {
   resposta_correta: string
 }
 
-quizRouter.get('/questoes', async(req, res) => {
-  const { olimpiada_id, nivel_id, quantidade } = req.query
-  const quantidadeNum = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
-
-  let query = supabaseAdmin
-  .from('questoes')
-  .select('id, assunto, enunciado, alternativas, imagem_url, imagem_alt')
-  .limit(quantidadeNum)
-
-  if(olimpiada_id) query = query.eq('olimpiada_id', olimpiada_id as string)
-  if(nivel_id) query = query.eq('nivel_id', nivel_id as string)
-
-  const { data, error } = await query
-
-  if(error) {
-    console.error('[quiz/questoes] erro:', error)
-    return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+function embaralhar<T>(lista: T[]): T[] {
+  const copia = [...lista]
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copia[i], copia[j]] = [copia[j], copia[i]]
   }
+  return copia
+}
 
-  res.json(data)
+
+quizRouter.get('/questoes', async (req, res) => {
+  const { olimpiada_id, nivel_id, quantidade = '5' } = req.query
+  const qtd = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
+
+  try {
+    // 1) só os IDs que atendem ao filtro (payload minúsculo)
+    let queryIds = supabaseAdmin.from('questoes').select('id')
+    if (olimpiada_id) queryIds = queryIds.eq('olimpiada_id', olimpiada_id as string)
+    if (nivel_id) queryIds = queryIds.eq('nivel_id', nivel_id as string)
+
+    const { data: ids, error: erroIds } = await queryIds
+    if (erroIds || !ids) {
+      console.error('[quiz/questoes] erro ao listar ids:', erroIds)
+      return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+    }
+
+    // 2) sorteia N
+    const sorteados = embaralhar(ids.map((r) => r.id)).slice(0, qtd)
+    if (sorteados.length === 0) return res.json([])
+
+    // 3) busca as questões completas (sem o gabarito)
+    const { data, error } = await supabaseAdmin
+      .from('questoes')
+      .select('id, assunto, enunciado, alternativas, imagem_url, imagem_alt')
+      .in('id', sorteados)
+
+    if (error || !data) {
+      console.error('[quiz/questoes] erro ao buscar questões:', error)
+      return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+    }
+
+    // 4) .in() não preserva a ordem: reordena pela ordem sorteada
+    const porId = new Map(data.map((q) => [q.id, q]))
+    res.json(sorteados.map((id) => porId.get(id)).filter(Boolean))
+  } catch (err) {
+    console.error('[quiz/questoes] erro inesperado:', err)
+    res.status(500).json({ error: 'Erro interno ao carregar as questões.' })
+  }
 })
 
   async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
