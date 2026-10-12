@@ -4,6 +4,10 @@ import TitlePrimary from '@/components/titles/TitlePrimary.vue';
 import { useSupabaseList } from '@/composables/useSupabaseList';
 import { supabase } from '@/lib/supabase';
 
+const props = defineProps<{
+  limite:number
+}>()
+
 interface Report {
   id: string,
   titulo: string,
@@ -14,7 +18,7 @@ interface Report {
   fonte_nome: string
 }
 
-const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabase.from('relatos_alunos').select('id, titulo, nome_aluno, texto, fonte_url, foto_url, fonte_nome').limit(2))
+const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabase.from('relatos_alunos').select('id, titulo, nome_aluno, texto, fonte_url, foto_url, fonte_nome').limit(props.limite))
 </script>
 
 <template>

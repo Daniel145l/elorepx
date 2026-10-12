@@ -65,7 +65,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     </div>
   </section>
 
-  <ReportsSection />
+  <ReportsSection :limite="2"/>
 
   <section class="px-5 mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
     <TitlePrimary texto="A ciência no dia a dia" class="text-white"/>

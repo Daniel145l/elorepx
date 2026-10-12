@@ -11,6 +11,8 @@ export const router = createRouter({
     { path: '/perfil', name: 'perfil', component: () => import('@/views/ProfileView.vue'), meta: { requiresAuth: true } },
     { path: '/olimpiadas', name: 'olimpiadas', component: () => import('@/views/OlimpiadasView.vue') },
     { path: '/cientistas', name: 'cientistas', component: () => import('@/views/CientistasView.vue') },
+    { path: '/relatos', name: 'relatos', component: () => import('@/views/RelatosView.vue') },
+
   ]
 });
 
