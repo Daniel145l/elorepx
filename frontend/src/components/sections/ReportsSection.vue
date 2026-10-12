@@ -28,7 +28,7 @@ const { items: relatos, loading, error } = useSupabaseList<Report>(() => supabas
     <p v-if="loading">Carregando...</p>
     <p v-else-if="error">Não foi possível carregar os relatos agora. Tente novamente mais tarde</p>
 
-    <div v-else class="flex flex-col gap-15.75 items-center">
+    <div v-else class="grid grid-cols-[repeat(auto-fit,minmax(min(18rem,100%),1fr))] justify-items-center gap-15.75 md:gap-6">
       <ReportCard v-for="relato in relatos" :key="relato.id" :relato="relato" />
     </div>
   </section>

@@ -40,7 +40,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     </div> -->
     <TitlePrimary :texto="'Desbloqueie novos poderes'" class="w-full mb-8"/>
 
-    <div class="w-full flex flex-col items-center gap-10">
+    <div class="w-full grid grid-cols-1 justify-items-center gap-10 md:grid-cols-3 md:gap-6">
       <PowerCard :titulo="'Mente Estratégica'" :texto="'Desenvolva o raciocínio lógico, o pensamento crítico e a capacidade de resolver problemas enquanto enfrenta novos desafios.'">
         <template #icon><Brain :size="20"/></template>
       </PowerCard>
@@ -67,13 +67,17 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
 
   <ReportsSection :limite="2"/>
 
-  <section class="px-5 mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
-    <TitlePrimary texto="A ciência no dia a dia" class="text-white"/>
-    <CuriosityCard />
-    <NasaApodCard />
+  <section class="mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
+    <div class="page-container">
+      <TitlePrimary texto="A ciência no dia a dia" class="text-white" />
+      <div class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        <CuriosityCard />
+        <NasaApodCard />
+      </div>
+    </div>
   </section>
 
-  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="mb-12 mx-5"/>
+  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="page-container"/>
 
   <ScientistsSection :limite="2"/>
 </template>

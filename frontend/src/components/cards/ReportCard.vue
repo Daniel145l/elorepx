@@ -19,7 +19,7 @@ const modalAberto = ref(false)
 </script>
 
 <template>
-  <article class="flex flex-col justify-between gap-5.75 rounded-sm bg-white align-middle items-center shadow-[0px_0px_5px_3px_rgba(0,0,0,0.25)] p-7 w-[85%]">
+  <article class="flex flex-col justify-between gap-5.75 rounded-sm bg-white align-middle items-center shadow-[0px_0px_5px_3px_rgba(0,0,0,0.25)] p-7 w-[85%] md:w-full">
     <h3 class="text-elorepx-purple-700 font-bold font-inter text-lg line-clamp-2 text-center">{{ relato.nome_aluno }}</h3>
     <p class="text-center font-inter line-clamp-5 font-light text-sm">{{ relato.texto }}</p>
     <ButtonPrimary :texto="'Saiba Mais'" class="w-full" @click="modalAberto = true"/>

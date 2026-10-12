@@ -17,7 +17,7 @@ const modalAberto = ref(false)
 </script>
 
 <template>
-  <article class="flex flex-col justify-between gap-5.75 rounded-sm bg-white align-middle items-center shadow-[0px_0px_5px_3px_rgba(0,0,0,0.25)] p-7 w-[85%] font-inter">
+  <article class="flex flex-col justify-between gap-5.75 rounded-sm bg-white align-middle items-center shadow-[0px_0px_5px_3px_rgba(0,0,0,0.25)] p-7 w-[85%] font-inter md:w-full">
     <img v-if="cientista.foto_url" :src="cientista.foto_url" :alt="cientista.nome" class="w-5 rounded-[10px] "/>
     <div v-else>
       <!-- pensar em algo para quando não tiver foto -->
