@@ -23,32 +23,34 @@ const links = [
 </script>
 
 <template>
-  <header class="flex justify-between items-center py-5 px-5 align-middle border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white">
-    <RouterLink to="/" @click="fechar"><img src="/logo.svg" alt="Elorepx"></RouterLink>
-
-    <!-- desktop -->
-    <nav class="hidden md:flex items-center gap-6 font-inter text-sm">
-      <RouterLink
-        v-for="l in links" :key="l.to" :to="l.to"
-        class="hover:text-elorepx-purple-600"
-        exact-active-class="font-bold text-elorepx-purple-600"
-      >{{ l.texto }}</RouterLink>
-
-      <template v-if="auth.isAuthenticated">
-        <BlueButton :texto="'Perfil'" :link="'perfil'">
-          <template #icone><User :size="18" /></template>
-        </BlueButton>
-        <RedButton :texto="'Sair'" />
-      </template>
-      <RouterLink v-else to="/login" class="font-bold text-elorepx-purple-600">Entrar</RouterLink>
-    </nav>
-
-    <!-- mobile -->
-    <button class="md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">
-      <Menu v-if="!aberto" :size="20" />
-      <X v-else :size="20" />
-    </button>
+  <header class="py-5 border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white">
+    <div class="page-container flex justify-between items-center">
+      <RouterLink to="/" @click="fechar"><img src="/logo.svg" alt="Elorepx"></RouterLink>
+    
+      <!-- desktop -->
+      <nav class="hidden md:flex items-center gap-6 font-inter text-sm">
+        <RouterLink
+          v-for="l in links" :key="l.to" :to="l.to"
+          class="hover:text-elorepx-purple-600"
+          exact-active-class="font-bold text-elorepx-purple-600"
+        >{{ l.texto }}</RouterLink>
+    
+        <template v-if="auth.isAuthenticated">
+          <BlueButton :texto="'Perfil'" :link="'perfil'">
+            <template #icone><User :size="18" /></template>
+          </BlueButton>
+          <RedButton :texto="'Sair'" />
+        </template>
+        <RouterLink v-else to="/login" class="font-bold text-elorepx-purple-600">Entrar</RouterLink>
+      </nav>
+    </div>
   </header>
+
+  <!-- mobile -->
+  <button class="md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">
+    <Menu v-if="!aberto" :size="20" />
+    <X v-else :size="20" />
+  </button>
 
   <!-- drawer: só mobile -->
   <nav
