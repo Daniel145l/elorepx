@@ -22,7 +22,7 @@ quizRouter.get('/questoes', async(req, res) => {
 
   let query = supabaseAdmin
   .from('questoes')
-  .select('id, assunto, enunciado, alternativas')
+  .select('id, assunto, enunciado, alternativas, imagem_url, imagem_alt')
   .limit(quantidadeNum)
 
   if(olimpiada_id) query = query.eq('olimpiada_id', olimpiada_id as string)
