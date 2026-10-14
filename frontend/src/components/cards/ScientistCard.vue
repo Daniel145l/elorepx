@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ButtonPrimary from '@/components/buttons/ButtonPrimary.vue';
 import DetailModal from '@/components/modal/DetailModal.vue';
-import { defineProps, ref, } from 'vue';
+import { ref } from 'vue';
 
 defineProps<{
   cientista: {

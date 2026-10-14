@@ -8,6 +8,7 @@ import { iaRouter } from './routes/ia.js'
 import { quizRouter } from './routes/quiz.js'
 
 const app = express()
+app.set('trust proxy', 1)
 const PORT = process.env.PORT ?? 3333
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173'
 
