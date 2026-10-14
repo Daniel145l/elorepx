@@ -3,10 +3,10 @@
 import { links } from '@/config/links'
 import { RouterLink } from 'vue-router'
 
-const email = 'SEU_EMAIL_AQUI'
+const email = 'daniellucasm18@gmail.com'
 const ano = new Date().getFullYear()
-const mailFeedback = `mailto:${'daniellucasm18@gmail.com'}?subject=${encodeURIComponent('Feedback Elorepx')}`
-const mailRemocao = `mailto:${'daniellucasm18@gmail.com'}?subject=${encodeURIComponent('Solicitação de remoção de conteúdo - Elorepx')}`
+const mailFeedback = `mailto:${email}?subject=${encodeURIComponent('Feedback Elorepx')}`
+const mailRemocao = `mailto:${email}?subject=${encodeURIComponent('Solicitação de remoção de conteúdo - Elorepx')}`
 </script>
 
 <template>
