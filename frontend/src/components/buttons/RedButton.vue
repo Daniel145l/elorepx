@@ -4,7 +4,6 @@ defineProps<{
 }>()
 import { useAuthStore } from '@/stores/auth';
 import { LogOut } from 'lucide-vue-next';
-import { defineProps, } from 'vue';
 import { useRouter } from 'vue-router';
 
 const auth = useAuthStore()
