@@ -16,85 +16,114 @@ interface Questao {
   resposta_correta: string
 }
 
-quizRouter.get('/questoes', async(req, res) => {
-  const { olimpiada_id, nivel_id, quantidade } = req.query
-  const quantidadeNum = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
-
-  let query = supabaseAdmin
-  .from('questoes')
-  .select('id, assunto, enunciado, alternativas')
-  .limit(quantidadeNum)
-
-  if(olimpiada_id) query = query.eq('olimpiada_id', olimpiada_id as string)
-  if(nivel_id) query = query.eq('nivel_id', nivel_id as string)
-
-  const { data, error } = await query
-
-  if(error) {
-    console.error('[quiz/questoes] erro:', error)
-    return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+function embaralhar<T>(lista: T[]): T[] {
+  const copia = [...lista]
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copia[i], copia[j]] = [copia[j], copia[i]]
   }
+  return copia
+}
 
-  res.json(data)
+
+quizRouter.get('/questoes', async (req, res) => {
+  const { olimpiada_id, nivel_id, quantidade = '5' } = req.query
+  const qtd = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
+
+  try {
+    // 1) só os IDs que atendem ao filtro (payload minúsculo)
+    let queryIds = supabaseAdmin.from('questoes').select('id')
+    if (olimpiada_id) queryIds = queryIds.eq('olimpiada_id', olimpiada_id as string)
+    if (nivel_id) queryIds = queryIds.eq('nivel_id', nivel_id as string)
+
+    const { data: ids, error: erroIds } = await queryIds
+    if (erroIds || !ids) {
+      console.error('[quiz/questoes] erro ao listar ids:', erroIds)
+      return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+    }
+
+    // 2) sorteia N
+    const sorteados = embaralhar(ids.map((r) => r.id)).slice(0, qtd)
+    if (sorteados.length === 0) return res.json([])
+
+    // 3) busca as questões completas (sem o gabarito)
+    const { data, error } = await supabaseAdmin
+      .from('questoes')
+      .select('id, assunto, enunciado, alternativas, imagem_url, imagem_alt')
+      .in('id', sorteados)
+
+    if (error || !data) {
+      console.error('[quiz/questoes] erro ao buscar questões:', error)
+      return res.status(502).json({ error: 'Não foi possível carregar as questões.' })
+    }
+
+    // 4) .in() não preserva a ordem: reordena pela ordem sorteada
+    const porId = new Map(data.map((q) => [q.id, q]))
+    res.json(sorteados.map((id) => porId.get(id)).filter(Boolean))
+  } catch (err) {
+    console.error('[quiz/questoes] erro inesperado:', err)
+    res.status(500).json({ error: 'Erro interno ao carregar as questões.' })
+  }
 })
 
-  async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
-    assunto: string
-    correta: boolean
-  }[]) {
-    const acertosPorAssunto: Record<string, number> = {}
-    for (const r of resultadosValidos) {
-      if (r.correta) {
-        acertosPorAssunto[r.assunto] = (acertosPorAssunto[r.assunto] ?? 0) + 1
-      }
-    }
-
-    const assuntosComAcerto = Object.keys(acertosPorAssunto)
-    if (assuntosComAcerto.length === 0) return
-
-    const { data: missoesRelevantes, error: erroMissoes } = await supabaseAdmin
-      .from('missoes')
-      .select('id, meta')
-      .in('meta->>assunto', assuntosComAcerto)
-
-    if (erroMissoes || !missoesRelevantes) {
-      console.error('[quiz/corrigir] falha ao buscar missões relevantes:', erroMissoes)
-      return
-    }
-
-    for (const missao of missoesRelevantes) {
-      const assunto = missao.meta.assunto as string
-      const meta = missao.meta.quantidade as number
-      const incremento = acertosPorAssunto[assunto]
-
-      const { data: progressoAtual } = await supabaseAdmin
-        .from('usuario_missoes')
-        .select('progresso, concluida')
-        .eq('user_id', userId)
-        .eq('missao_id', missao.id)
-        .maybeSingle()
-
-      const progressoAnterior = progressoAtual?.progresso ?? 0
-      const novoProgresso = Math.min(meta, progressoAnterior + incremento)
-      const novaConclusao = novoProgresso >= meta
-
-      const { error: erroUpsert } = await supabaseAdmin
-        .from('usuario_missoes')
-        .upsert(
-          {
-            user_id: userId,
-            missao_id: missao.id,
-            progresso: novoProgresso,
-            concluida: novaConclusao,
-          },
-          { onConflict: 'user_id,missao_id' }
-        )
-
-      if (erroUpsert) {
-        console.error('[quiz/corrigir] falha ao atualizar progresso de missão:', erroUpsert)
-      }
+async function atualizarProgressoMissoes(
+  userId: string,
+  resultadosValidos: { assunto: string; correta: boolean }[]
+) {
+  const acertosPorAssunto: Record<string, number> = {}
+  let totalAcertos = 0
+  for (const r of resultadosValidos) {
+    if (r.correta) {
+      acertosPorAssunto[r.assunto] = (acertosPorAssunto[r.assunto] ?? 0) + 1
+      totalAcertos++
     }
   }
+  if (totalAcertos === 0) return
+
+  const { data: missoes, error: erroMissoes } = await supabaseAdmin
+    .from('missoes')
+    .select('id, meta')
+
+  if (erroMissoes || !missoes) {
+    console.error('[quiz/corrigir] falha ao buscar missões:', erroMissoes)
+    return
+  }
+
+  const { data: progressos } = await supabaseAdmin
+    .from('usuario_missoes')
+    .select('missao_id, progresso, concluida')
+    .eq('user_id', userId)
+
+  const progressoPorMissao = new Map((progressos ?? []).map((p) => [p.missao_id, p]))
+
+  for (const missao of missoes) {
+    const assunto = (missao.meta.assunto ?? null) as string | null
+    const alvo = missao.meta.quantidade as number
+    const incremento = assunto === null ? totalAcertos : (acertosPorAssunto[assunto] ?? 0)
+    if (incremento === 0) continue
+
+    const atual = progressoPorMissao.get(missao.id)
+    if (atual?.concluida) continue
+
+    const novoProgresso = Math.min(alvo, (atual?.progresso ?? 0) + incremento)
+
+    const { error: erroUpsert } = await supabaseAdmin
+      .from('usuario_missoes')
+      .upsert(
+        {
+          user_id: userId,
+          missao_id: missao.id,
+          progresso: novoProgresso,
+          concluida: novoProgresso >= alvo,
+        },
+        { onConflict: 'user_id,missao_id' }
+      )
+
+    if (erroUpsert) {
+      console.error('[quiz/corrigir] falha ao atualizar progresso de missão:', erroUpsert)
+    }
+  }
+}
 
 const XP_POR_ACERTO = 10
 

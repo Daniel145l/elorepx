@@ -32,7 +32,7 @@ function olimpiadaClass(olimpiadaNome: string): string {
   <!-- <Header /> -->
   <ApresentationSection :text="'Conheça mais sobre as olimpíadas'" :text-button="'Treinar'" :link="'simulados'"/>
 
-  <section class="px-4 mt-8 flex flex-col gap-4">
+  <section class="page-container mt-8 flex flex-col gap-4">
     <TitlePrimary :texto="'Olimpíadas'" />
 
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">

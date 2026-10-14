@@ -6,8 +6,8 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-[url(/background-primary.svg)] bg-center bg-cover h-screen z-0 relative box-border px-6">
-    <div class="relative flex flex-col justify-center h-full gap-8">
+  <div class="bg-[url(/background-primary.svg)] bg-center bg-cover min-h-dvh z-0 relative box-border px-6">
+    <div class="relative flex flex-col justify-center min-h-dvh py-8 gap-8">
       <div class="text-center">
         <h1 class="text-white text-2xl font-bold font-display">{{titulo}}</h1>
         <p class="text-white">{{ subtitulo }}</p>

@@ -21,12 +21,12 @@ const { items: cientistas, loading, error } = useSupabaseList<Scientist>(() => s
 </script>
 
 <template>
-  <section class="px-5 flex flex-col items-center">
+  <section class="page-container flex flex-col items-center">
     
     <p v-if="loading">Carregando...</p>
     <p v-else-if="error">Não foi possível carregar os cientistas agora. Tente novamente mais tarde</p>
 
-    <div v-else class="grid grid-cols-1 justify-center justify-items-center gap-15.75 sm:grid-cols-2 sm:gap-2">
+    <div v-else class="w-full grid grid-cols-[repeat(auto-fit,minmax(min(18rem,100%),1fr))] justify-items-center gap-15.75 md:gap-6">
       <ScientistCard v-for="cientista in cientistas" :key="cientista.id" :cientista="cientista" />
     </div>
   </section>

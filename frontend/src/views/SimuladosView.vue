@@ -13,14 +13,17 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
 
  interface Alternativa {
   id: string;
-  texto: string
+  texto: string;
+  imagem_url?: string
  }
 
  interface Questao {
   id: string;
   assunto: string;
   enunciado: string;
-  alternativas: Alternativa[]
+  alternativas: Alternativa[];
+  imagem_url: string | null;
+  imagem_alt: string | null;
  }
 
  interface ResultadoQuestao {
@@ -408,9 +411,22 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
           <span><BookMarkedIcon :size="20" /></span>
           <span class="uppercase tracking-wider">{{ questaoAtual.assunto || 'Conhecimentos Gerais' }}</span>
         </div>
-        <h2 class="font-bold text-elorepx-purple-950 text-base">
+        <h3 class="font-bold text-elorepx-purple-950 text-base">
           {{ questaoAtual.enunciado }}
-        </h2>
+        </h3>
+        <a
+          v-if="questaoAtual.imagem_url"
+          :href="questaoAtual.imagem_url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-4 block"
+        >
+          <img
+            :src="questaoAtual.imagem_url"
+            :alt="questaoAtual.imagem_alt ?? 'Imagem da questão'"
+            class="w-full max-h-72 object-contain rounded-lg border bg-white"
+          />
+        </a>
       </div>
 
       <!-- Lista de Alternativas -->

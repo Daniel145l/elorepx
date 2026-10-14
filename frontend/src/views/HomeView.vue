@@ -21,26 +21,17 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
   Agradeço a sophia por me ajudar em todos os momentos a fazer essa plataforma! Esperamos que vocês gostem 
   -->
 
-  <ApresentationSection :text="'Vire um cientista e venha explorar o mundo que está a sua volta'" :text-button="'Explorar'" :link="'olimpiadas'"/>
-  <!-- <section class="mt-6 px-5 relative">
-    <div class="relative">
-      <img src="/background-home.svg" alt="" class="relative w-full">
-      <div class="absolute top-[50%] flex flex-col items-center translate-y-[-50%] gap-5 px-4 text-center w-full">
-        <h1 class="text-white text-center font-display text-xl">Vire um cientista e venha explorar o mundo que está a sua volta</h1>
-        <RouterLink to="/cadastro" class="w-[40%]">
-          <ButtonPrimary :texto="'Explorar'" class="w-full text-sm"/>
-        </RouterLink>
-      </div>
-    </div>
-  </section> -->
+  <ApresentationSection 
+    :text="'Vire um cientista e venha explorar o mundo que está a sua volta'"
+    :text-button="'Explorar'"
+    :link="'olimpiadas'"
+    class="mt-12"
+  />
 
-  <section class="px-5 my-12">
-    <!-- <div class="bg-[url(/fita.svg)] bg-center bg-contain bg-no-repeat w-full h-21.25">
-      <h2>Desbloqueie novos poderes</h2>
-    </div> -->
+  <section class="page-container my-18">
     <TitlePrimary :texto="'Desbloqueie novos poderes'" class="w-full mb-8"/>
 
-    <div class="w-full flex flex-col items-center gap-10">
+    <div class="w-full grid grid-cols-1 justify-items-center gap-10 md:grid-cols-3 md:gap-6">
       <PowerCard :titulo="'Mente Estratégica'" :texto="'Desenvolva o raciocínio lógico, o pensamento crítico e a capacidade de resolver problemas enquanto enfrenta novos desafios.'">
         <template #icon><Brain :size="20"/></template>
       </PowerCard>
@@ -55,11 +46,12 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     </div>
   </section>
 
-  <section class="mb-8">
+  <section class="mb-8 mt-26">
     <!-- bg-[url(/nuvem-cut.svg)] bg-top bg-contain bg-no-repeat -->
-    <img src="/cloud-bg-cut.svg" alt="" class="w-full">
+    <!-- <img src="/cloud-bg-cut.svg" alt="" class="w-full"> -->
+    <img src="/nuvem-cut.svg" alt="" class="w-full">
     <!-- /nuvem-cut.svg -->
-    <div class="bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500 w-full px-5 pb-5 flex flex-col items-center border-b">
+    <div class="bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500 w-full px-5 pb-5 flex flex-col items-center border-b md:min-h-100">
       <h3 class="font-display text-white">MISSÃO PARA VOCÊ</h3>
       <MissionCard class="my-6"/>
     </div>
@@ -67,13 +59,17 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
 
   <ReportsSection :limite="2"/>
 
-  <section class="px-5 mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
-    <TitlePrimary texto="A ciência no dia a dia" class="text-white"/>
-    <CuriosityCard />
-    <NasaApodCard />
+  <section class="mb-8 py-5 bg-linear-to-b from-elorepx-purple-700 via-elorepx-purple-600 to-elorepx-purple-500">
+    <div class="page-container">
+      <TitlePrimary texto="A ciência no dia a dia" class="text-white" />
+      <div class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        <CuriosityCard />
+        <NasaApodCard />
+      </div>
+    </div>
   </section>
 
-  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="mb-12 mx-5"/>
+  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="page-container"/>
 
   <ScientistsSection :limite="2"/>
 </template>

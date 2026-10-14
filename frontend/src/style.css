@@ -12,3 +12,10 @@
   --font-display: "Madimi One", sans-serif;
   --font-inter: "Inter", sans-serif;
 }
+
+@utility page-container {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
