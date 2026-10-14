@@ -66,63 +66,64 @@ quizRouter.get('/questoes', async (req, res) => {
   }
 })
 
-  async function atualizarProgressoMissoes(userId: string, resultadosValidos: {
-    assunto: string
-    correta: boolean
-  }[]) {
-    const acertosPorAssunto: Record<string, number> = {}
-    for (const r of resultadosValidos) {
-      if (r.correta) {
-        acertosPorAssunto[r.assunto] = (acertosPorAssunto[r.assunto] ?? 0) + 1
-      }
-    }
-
-    const assuntosComAcerto = Object.keys(acertosPorAssunto)
-    if (assuntosComAcerto.length === 0) return
-
-    const { data: missoesRelevantes, error: erroMissoes } = await supabaseAdmin
-      .from('missoes')
-      .select('id, meta')
-      .in('meta->>assunto', assuntosComAcerto)
-
-    if (erroMissoes || !missoesRelevantes) {
-      console.error('[quiz/corrigir] falha ao buscar missões relevantes:', erroMissoes)
-      return
-    }
-
-    for (const missao of missoesRelevantes) {
-      const assunto = missao.meta.assunto as string
-      const meta = missao.meta.quantidade as number
-      const incremento = acertosPorAssunto[assunto]
-
-      const { data: progressoAtual } = await supabaseAdmin
-        .from('usuario_missoes')
-        .select('progresso, concluida')
-        .eq('user_id', userId)
-        .eq('missao_id', missao.id)
-        .maybeSingle()
-
-      const progressoAnterior = progressoAtual?.progresso ?? 0
-      const novoProgresso = Math.min(meta, progressoAnterior + incremento)
-      const novaConclusao = novoProgresso >= meta
-
-      const { error: erroUpsert } = await supabaseAdmin
-        .from('usuario_missoes')
-        .upsert(
-          {
-            user_id: userId,
-            missao_id: missao.id,
-            progresso: novoProgresso,
-            concluida: novaConclusao,
-          },
-          { onConflict: 'user_id,missao_id' }
-        )
-
-      if (erroUpsert) {
-        console.error('[quiz/corrigir] falha ao atualizar progresso de missão:', erroUpsert)
-      }
+async function atualizarProgressoMissoes(
+  userId: string,
+  resultadosValidos: { assunto: string; correta: boolean }[]
+) {
+  const acertosPorAssunto: Record<string, number> = {}
+  let totalAcertos = 0
+  for (const r of resultadosValidos) {
+    if (r.correta) {
+      acertosPorAssunto[r.assunto] = (acertosPorAssunto[r.assunto] ?? 0) + 1
+      totalAcertos++
     }
   }
+  if (totalAcertos === 0) return
+
+  const { data: missoes, error: erroMissoes } = await supabaseAdmin
+    .from('missoes')
+    .select('id, meta')
+
+  if (erroMissoes || !missoes) {
+    console.error('[quiz/corrigir] falha ao buscar missões:', erroMissoes)
+    return
+  }
+
+  const { data: progressos } = await supabaseAdmin
+    .from('usuario_missoes')
+    .select('missao_id, progresso, concluida')
+    .eq('user_id', userId)
+
+  const progressoPorMissao = new Map((progressos ?? []).map((p) => [p.missao_id, p]))
+
+  for (const missao of missoes) {
+    const assunto = (missao.meta.assunto ?? null) as string | null
+    const alvo = missao.meta.quantidade as number
+    const incremento = assunto === null ? totalAcertos : (acertosPorAssunto[assunto] ?? 0)
+    if (incremento === 0) continue
+
+    const atual = progressoPorMissao.get(missao.id)
+    if (atual?.concluida) continue
+
+    const novoProgresso = Math.min(alvo, (atual?.progresso ?? 0) + incremento)
+
+    const { error: erroUpsert } = await supabaseAdmin
+      .from('usuario_missoes')
+      .upsert(
+        {
+          user_id: userId,
+          missao_id: missao.id,
+          progresso: novoProgresso,
+          concluida: novoProgresso >= alvo,
+        },
+        { onConflict: 'user_id,missao_id' }
+      )
+
+    if (erroUpsert) {
+      console.error('[quiz/corrigir] falha ao atualizar progresso de missão:', erroUpsert)
+    }
+  }
+}
 
 const XP_POR_ACERTO = 10
 
