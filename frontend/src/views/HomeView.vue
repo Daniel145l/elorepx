@@ -69,7 +69,7 @@ import ApresentationSection from '@/components/sections/ApresentationSection.vue
     </div>
   </section>
 
-  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="page-container"/>
+  <TitlePrimary :texto="'Conheça quem mudou o mundo'" class="page-container mb-8"/>
 
   <ScientistsSection :limite="2"/>
 </template>
