@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ArrowUpRight } from 'lucide-vue-next';
-import { defineProps, } from 'vue';
 import ButtonSecondary from '../buttons/ButtonSecondary.vue';
 
   defineProps<{

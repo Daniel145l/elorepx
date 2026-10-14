@@ -2,7 +2,6 @@
 import ScientistCard from '@/components/cards/ScientistCard.vue';
 import { useSupabaseList } from '@/composables/useSupabaseList';
 import { supabase } from '@/lib/supabase';
-import { defineProps, } from 'vue';
 
 const props = defineProps<{
   limite:number
