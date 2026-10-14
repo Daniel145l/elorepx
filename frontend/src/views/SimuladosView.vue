@@ -283,19 +283,23 @@ type Etapa = 'selecao' | 'selecao-nivel' | 'selecao-qtd-questoes' | 'respondendo
   
       <div class="flex flex-col p-4 gap-3 border border-t-0 rounded-b-2xl shadow-sm">
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="flex w-full gap-4 items-center justify-center">
           <button
             v-for="olimpiada in olimpiadas"
             :key="olimpiada.id"
             :disabled="carregando"
-            class="flex flex-col items-center justify-center p-4 bg-white border-2 rounded-2xl transition-all duration-200 hover:border-purple-300 hover:shadow-md disabled:opacity-50 text-center relative"
-            :class="olimpiadaEscolhida?.id === olimpiada.id 
-              ? 'border-elorepx-purple-600 bg-purple-50/60 shadow-sm scale-[1.02]' 
-              : 'border-gray-300 hover:bg-gray-50'"
+            class="flex flex-col items-center justify-center p-4 bg-white border-2 rounded-2xl transition-all duration-200 hover:border-purple-300 hover:shadow-md disabled:opacity-50 text-center relative w-[30%]"
+            :class="[
+              olimpiadaEscolhida?.id === olimpiada.id
+                ? 'border-elorepx-purple-600 bg-purple-50/60 shadow-sm scale-[1.02]'
+                : 'border-gray-300 hover:bg-gray-50',
+              olimpiada.nome == 'ONC' ? 'hidden' : 'inline'
+            ]"
             @click="escolherOlimpiada(olimpiada)"
+            
           >
 
-            <span class="text-3xl mb-2">
+            <span class="text-3xl mb-2 text-center flex flex-col justify-center items-center">
               <span v-if="olimpiada.nome.includes('OBA')"><Rocket /></span>
               <span v-else-if="olimpiada.nome.includes('OBFEP')"><ZapIcon /></span>
               <span v-else-if="olimpiada.nome.includes('ONC')"><MicroscopeIcon /></span>
