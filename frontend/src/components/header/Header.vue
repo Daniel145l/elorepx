@@ -23,8 +23,8 @@ const links = [
 </script>
 
 <template>
-  <header class="py-5 border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white">
-    <div class="page-container flex justify-between items-center">
+  <header class="py-5 border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white flex page-container justify-between">
+    <div class="flex justify-between items-center">
       <RouterLink to="/" @click="fechar"><img src="/logo.svg" alt="Elorepx"></RouterLink>
     
       <!-- desktop -->
@@ -44,14 +44,25 @@ const links = [
         <RouterLink v-else to="/login" class="font-bold text-elorepx-purple-600">Entrar</RouterLink>
       </nav>
     </div>
-  </header>
-
   <!-- mobile -->
   <button class="md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">
     <Menu v-if="!aberto" :size="20" />
     <X v-else :size="20" />
   </button>
-
+  </header>
+  <Transition
+    enter-active-class="transition-opacity duration-200"
+    enter-from-class="opacity-0"
+    leave-active-class="transition-opacity duration-200"
+    leave-to-class="opacity-0"
+  >
+    <div
+      v-if="aberto"
+      class="md:hidden fixed inset-x-0 top-18 bottom-0 z-40 bg-black/40"
+      aria-hidden="true"
+      @click="fechar"
+    />
+  </Transition>
   <!-- drawer: só mobile -->
   <nav
     class="md:hidden fixed left-0 top-18 bottom-0 z-50 w-[70%] max-w-xs bg-gray-100 p-4 flex flex-col font-inter gap-4 text-sm transition-transform duration-200 shadow-[6px_0px_6px_1px_rgba(0,0,0,0.1)]"
