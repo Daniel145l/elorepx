@@ -23,8 +23,8 @@ const links = [
 </script>
 
 <template>
-  <header class="py-5 border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white flex page-container justify-between">
-    <div class="flex justify-between items-center">
+  <header class="py-5 border-b shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] sticky top-0 z-50 bg-white flex justify-between w-full">
+    <div class="flex justify-between items-center page-container">
       <RouterLink to="/" @click="fechar"><img src="/logo.svg" alt="Elorepx"></RouterLink>
     
       <!-- desktop -->
@@ -45,7 +45,7 @@ const links = [
       </nav>
     </div>
   <!-- mobile -->
-  <button class="md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">
+  <button class="px-3 md:hidden" @click="aberto = !aberto" aria-label="Abrir menu">
     <Menu v-if="!aberto" :size="20" />
     <X v-else :size="20" />
   </button>
