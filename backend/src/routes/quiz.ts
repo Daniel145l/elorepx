@@ -26,6 +26,17 @@ function embaralhar<T>(lista: T[]): T[] {
 }
 
 
+/**
+ * @swagger
+ * /api/quiz:
+ *   get:
+ *     summary: Retorna as questões dos simulados
+ *     tags: [Quiz]
+ *     responses:
+ *       200:
+ *         description: Lista de questões obtida com sucesso.
+ */
+
 quizRouter.get('/questoes', async (req, res) => {
   const { olimpiada_id, nivel_id, quantidade = '5' } = req.query
   const qtd = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
@@ -251,12 +262,19 @@ interface RespostaEnviada {
   resposta_dada: string
 }
 
+const MAX_RESPOSTAS = 20
+
 quizRouter.post('/corrigir', async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const { respostas }: { respostas: RespostaEnviada[] } = req.body ?? {}
 
+  
   if (!Array.isArray(respostas) || respostas.length === 0) {
     return res.status(400).json({ error: 'Campo obrigatório: respostas (array não vazio)' })
+  }
+
+  if(respostas.length > MAX_RESPOSTAS) {
+    return res.status(400).json({ error: `Máximo de ${MAX_RESPOSTAS} respostas` })
   }
 
   try {
