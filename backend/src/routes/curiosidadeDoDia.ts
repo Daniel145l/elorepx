@@ -9,9 +9,10 @@ function dataDeHojeNoBrasil(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' })
 }
 
-function temaDoDia(): string {
+function temaDoDia(hoje: string): string {
+  const [a, m, d] = hoje.split('-').map(Number)
   const diaDoAno = Math.floor(
-    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+    (Date.UTC(a, m - 1, d) - Date.UTC(a, 0, 0)) / 86400000
   )
   return TEMAS_COTIDIANO[diaDoAno % TEMAS_COTIDIANO.length]
 }
@@ -28,7 +29,7 @@ curiosidadeDoDiaRouter.get('/', async(req, res) => {
   if(existente) return res.json(existente)
 
   try {
-    const tema = temaDoDia()
+    const tema = temaDoDia(hoje)
     const prompt = `Explique de forma simples e envolvente, para um estudante de ensino fundamental/médio, a seguinte curiosidade científica do cotidiano: "${tema}". Máximo 3 parágrafos curtos.`
     const texto = await llmClient.gerarTexto(prompt)
     const { data: nova, error } = await supabaseAdmin
