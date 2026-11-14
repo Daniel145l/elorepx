@@ -1,3 +1,3 @@
-export interface llmClient {
+export interface LlmClient {
   gerarTexto(prompt: string): Promise<string>
 }
