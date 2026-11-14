@@ -1,8 +1,8 @@
-import type { llmClient } from './types.js'
+import type { LlmClient } from './types.js'
 
 const DEEPSEEK_MODEL = 'deepseek-flash'
 
-export const deepseekClient: llmClient = {
+export const deepseekClient: LlmClient = {
   async gerarTexto(prompt: string): Promise<string> {
     const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) throw new Error('DEEPSEEK_API_KEY não definida em backend/.env')
@@ -14,9 +14,12 @@ export const deepseekClient: llmClient = {
         authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
+        signal: AbortSignal.timeout(20_000),
         model: DEEPSEEK_MODEL,
         messages: [{ role: 'user', content: prompt }],
         stream: false,
+        temperature: 0.3,
+        max_tokens: 600,
       }),
     })
 
