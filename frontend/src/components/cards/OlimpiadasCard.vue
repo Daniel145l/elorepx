@@ -6,6 +6,7 @@ import ButtonSecondary from '../buttons/ButtonSecondary.vue';
     nome: string
     descricao: string
     link: string
+    redeSocial: string
   }>()
 </script>
 
@@ -20,6 +21,13 @@ import ButtonSecondary from '../buttons/ButtonSecondary.vue';
     </div>
     <a v-if="link" :href="link" target="_blank">
       <ButtonSecondary :texto="'Conhecer'">
+        <template #icone>
+          <ArrowUpRight :size="20"/>
+        </template>
+      </ButtonSecondary>
+    </a>
+    <a v-if="redeSocial" :href="redeSocial" target="_blank">
+      <ButtonSecondary :texto="'Instagram'">
         <template #icone>
           <ArrowUpRight :size="20"/>
         </template>
