@@ -38,17 +38,6 @@ async function explicar(prompt: string): Promise<string | null> {
   return null
 }
 
-/**
- * @swagger
- * /api/quiz:
- *   get:
- *     summary: Retorna as questões dos simulados
- *     tags: [Quiz]
- *     responses:
- *       200:
- *         description: Lista de questões obtida com sucesso.
- */
-
 quizRouter.get('/questoes', async (req, res) => {
   const { olimpiada_id, nivel_id, quantidade = '5' } = req.query
   const qtd = Math.min(Math.max(Number(quantidade) || 5, 1), 20)
@@ -313,14 +302,22 @@ quizRouter.post('/corrigir', async (req, res) => {
         let explicacao: string | null = null
 
         if (!correta) {
+
+          type Alt = { id: string; texto: string }
+          const alts = (questao.alternativas ?? []) as Alt[]
+          const textoDe = (id: string) => alts.find((a) => a.id === id)?.texto ?? id
+          const lista = alts.map((a) => `${a.id}) ${a.texto}`).join('\n')
+
           const prompt = `Você é um professor explicando ciências para um estudante de ensino fundamental/médio se preparando para olimpíadas científicas.
 
           Questão: ${questao.enunciado}
+          Alternativas:
+          ${lista}
           Assunto: ${questao.assunto}
-          Resposta correta: ${questao.resposta_correta}
-          Resposta do aluno: ${r.resposta_dada}
+          Resposta correta: ${questao.resposta_correta}) ${textoDe(questao.resposta_correta)}
+          Resposta do aluno: ${r.resposta_dada}) ${textoDe(r.resposta_dada)}
 
-          Explique, em até 3 parágrafos curtos e linguagem simples, por que a resposta correta é ${questao.resposta_correta} e não ${r.resposta_dada}.`
+          Explique, em até 3 parágrafos curtos, em linguagem simples e texto sem formatação Markdown, por que a resposta correta é a alternativa ${questao.resposta_correta} e não a ${r.resposta_dada}.`
           //   try {
           //     explicacao = await llmClient.gerarTexto(prompt)
           //   } catch (err) {
