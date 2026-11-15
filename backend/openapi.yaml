@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: API Elorepx
+  version: 1.0.0
+servers:
+  - url: https://elorepx-api.onrender.com
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+paths:
+  /api/quiz/questoes:
+    get:
+      summary: Sorteia questões (sem gabarito)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: olimpiada_id, in: query, schema: { type: string } }
+        - { name: nivel_id, in: query, schema: { type: string } }
+        - { name: quantidade, in: query, schema: { type: integer, minimum: 1, maximum: 20, default: 5 } }
+      responses:
+        '200': { description: Lista de questões }
+        '401': { description: Não autenticado }
+  /api/quiz/corrigir:
+    post:
+      summary: Corrige o simulado, gera explicações e atualiza a gamificação
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [respostas]
+              properties:
+                respostas:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  items:
+                    type: object
+                    required: [questao_id, resposta_dada]
+                    properties:
+                      questao_id: { type: string }
+                      resposta_dada: { type: string }
+      responses:
+        '200': { description: Resultados, resumo por assunto e progresso de gamificação }
+        '400': { description: Corpo inválido }
+        '401': { description: Não autenticado }
+  /api/ia/curiosidade:
+    post:
+      summary: Explica como o conteúdo de uma questão aparece no cotidiano
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tema]
+              properties:
+                tema: { type: string, maxLength: 3000, description: "Assunto e enunciado da questão" }
+      responses:
+        '200': { description: "Objeto com o campo curiosidade" }
+        '400': { description: Tema ausente ou inválido }
+        '401': { description: Não autenticado }
+        '429': { description: Limite diário de IA atingido }
+        '502': { description: Falha no provedor de LLM }
+  /api/curiosidade-do-dia:
+    get:
+      summary: Curiosidade do dia (gerada uma vez por data e armazenada)
+      responses:
+        '200': { description: Tema e texto }
+        '502': { description: Falha ao gerar }
+  /api/conteudo/nasa/apod:
+    get:
+      summary: Imagem astronômica do dia com título e explicação traduzidos
+      responses:
+        '200': { description: "title, explanation, url, hdurl, media_type, date, copyright" }
+        '502': { description: Falha ao obter o conteúdo da NASA }

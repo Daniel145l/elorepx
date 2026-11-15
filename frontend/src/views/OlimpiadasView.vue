@@ -13,10 +13,11 @@ import { FlaskConical, Microscope, Rocket, ZapIcon } from 'lucide-vue-next';
   descricao: string
   detalhamento: string
   site_oficial: string
+  rede_social: string
  }
 
 const { items: olimpiadas } = useSupabaseList<Olimpiada>(() => 
-  supabase.from('olimpiadas').select('id, nome, descricao, detalhamento, site_oficial')
+  supabase.from('olimpiadas').select('id, nome, descricao, detalhamento, site_oficial, rede_social')
 )
 
 function olimpiadaClass(olimpiadaNome: string): string {
@@ -43,6 +44,7 @@ function olimpiadaClass(olimpiadaNome: string): string {
         :descricao="olimpiada.detalhamento"
         :link="olimpiada.site_oficial"
         :class="olimpiadaClass(olimpiada.nome)"
+        :rede-social="olimpiada.rede_social"
       > 
         <template #icon>
           <Rocket v-if="olimpiada.nome === 'OBA'" class="text-white" />

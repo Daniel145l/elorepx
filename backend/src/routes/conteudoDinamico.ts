@@ -66,10 +66,8 @@ ${texto}`
 
 conteudoDinamicoRouter.get('/nasa/apod', async (req, res) => {
   if(cacheApod && cacheApod.expiraEm > Date.now()) {
-    res.json(cacheApod.data)
+    return res.json(cacheApod.data)
   }
-
-  const apiKey = process.env.NASA_API_KEY || 'DEMO_KEY'
 
   try {
     const response = await fetch('https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=1')
@@ -79,7 +77,7 @@ conteudoDinamicoRouter.get('/nasa/apod', async (req, res) => {
     }
 
     const retornoAPOD = await response.json()
-    const dadosOriginais = await retornoAPOD[0]
+    const dadosOriginais = retornoAPOD[0]
 
     if(!dadosOriginais) {
       throw new Error('Dados não retornados da API da NASAA')
@@ -91,7 +89,7 @@ conteudoDinamicoRouter.get('/nasa/apod', async (req, res) => {
 
     const [tituloPt, explanationPt] = await Promise.all([
       llmClient.gerarTexto(`Traduza o seguinte título de astronomia para o português do Brasil. Retorne APENAS a tradução: "${dadosOriginais.title}"`),
-      traduzirEResumir(dadosOriginais.explanation)
+      traduzirEResumir(textoInglesLimpo)
     ])
 
     const dadosTraduzidos = {

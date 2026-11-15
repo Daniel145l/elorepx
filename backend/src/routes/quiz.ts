@@ -25,6 +25,29 @@ function embaralhar<T>(lista: T[]): T[] {
   return copia
 }
 
+async function explicar(prompt: string): Promise<string | null> {
+  for (let tentativa = 0; tentativa < 2; tentativa++) {
+    try {
+      const texto = (await llmClient.gerarTexto(prompt))?.trim()
+      if (texto) return texto
+      console.warn('[quiz/corrigir] explicação vazia, tentativa', tentativa + 1)
+    } catch (err) {
+      console.error('[quiz/corrigir] falha ao gerar explicação:', err)
+    }
+  }
+  return null
+}
+
+/**
+ * @swagger
+ * /api/quiz:
+ *   get:
+ *     summary: Retorna as questões dos simulados
+ *     tags: [Quiz]
+ *     responses:
+ *       200:
+ *         description: Lista de questões obtida com sucesso.
+ */
 
 quizRouter.get('/questoes', async (req, res) => {
   const { olimpiada_id, nivel_id, quantidade = '5' } = req.query
@@ -251,12 +274,19 @@ interface RespostaEnviada {
   resposta_dada: string
 }
 
+const MAX_RESPOSTAS = 20
+
 quizRouter.post('/corrigir', async (req, res) => {
   const authReq = req as AuthenticatedRequest
   const { respostas }: { respostas: RespostaEnviada[] } = req.body ?? {}
 
+  
   if (!Array.isArray(respostas) || respostas.length === 0) {
     return res.status(400).json({ error: 'Campo obrigatório: respostas (array não vazio)' })
+  }
+
+  if(respostas.length > MAX_RESPOSTAS) {
+    return res.status(400).json({ error: `Máximo de ${MAX_RESPOSTAS} respostas` })
   }
 
   try {
@@ -285,17 +315,21 @@ quizRouter.post('/corrigir', async (req, res) => {
         if (!correta) {
           const prompt = `Você é um professor explicando ciências para um estudante de ensino fundamental/médio se preparando para olimpíadas científicas.
 
-        Questão: ${questao.enunciado}
-        Assunto: ${questao.assunto}
-        Resposta correta: ${questao.resposta_correta}
-        Resposta do aluno: ${r.resposta_dada}
+          Questão: ${questao.enunciado}
+          Assunto: ${questao.assunto}
+          Resposta correta: ${questao.resposta_correta}
+          Resposta do aluno: ${r.resposta_dada}
 
-        Explique, em até 3 parágrafos curtos e linguagem simples, por que a resposta correta é ${questao.resposta_correta} e não ${r.resposta_dada}.`
-          try {
-            explicacao = await llmClient.gerarTexto(prompt)
-          } catch (err) {
-            console.error('[quiz/corrigir] falha ao gerar explicação:', err)
-          }
+          Explique, em até 3 parágrafos curtos e linguagem simples, por que a resposta correta é ${questao.resposta_correta} e não ${r.resposta_dada}.`
+          //   try {
+          //     explicacao = await llmClient.gerarTexto(prompt)
+          //   } catch (err) {
+          //     console.error('[quiz/corrigir] falha ao gerar explicação:', err)
+          //   }
+          // }
+
+          explicacao = await explicar(prompt)
+
         }
 
         return {

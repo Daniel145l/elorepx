@@ -1,10 +1,12 @@
 import { deepseekClient } from './deepSeekClient.js'
-import type { llmClient } from './types.js'
+import { geminiClient } from './geminiClient.js'
+import type { LlmClient } from './types.js'
 
-const provedor = process.env.LLM_PROVIDER ?? 'gemini'
+const provedor = process.env.LLM_PROVIDER ?? 'deepseek'
 
-const clientesDisponiveis: Record<string, llmClient> = {
+const clientesDisponiveis: Record<string, LlmClient> = {
   deepseek: deepseekClient,
+  gemini: geminiClient
 }
 
 const llmClient = clientesDisponiveis[provedor]
